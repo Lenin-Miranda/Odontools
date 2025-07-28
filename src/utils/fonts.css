@@ -1,0 +1,53 @@
+.font-inter {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.font-inter-400 {
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.font-inter-500 {
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 500;
+}
+
+/* Roboto font family */
+.font-roboto {
+  font-family: "Roboto", system-ui, sans-serif;
+}
+
+.font-roboto-400 {
+  font-family: "Roboto", system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.font-roboto-500 {
+  font-family: "Roboto", system-ui, sans-serif;
+  font-weight: 500;
+}
+
+.font-roboto-700 {
+  font-family: "Roboto", system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.font-roboto-900 {
+  font-family: "Roboto", system-ui, sans-serif;
+  font-weight: 900;
+}
+
+/* Roboto Slab font family */
+.font-roboto-slab {
+  font-family: "Roboto Slab", serif;
+}
+
+.font-roboto-slab-400 {
+  font-family: "Roboto Slab", serif;
+  font-weight: 400;
+}
+
+.font-roboto-slab-700 {
+  font-family: "Roboto Slab", serif;
+  font-weight: 700;
+}

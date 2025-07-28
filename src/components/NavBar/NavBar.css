@@ -1,0 +1,98 @@
+.navbar {
+  max-width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  z-index: 1000; /* Ensure it stays at the top */
+  position: fixed;
+  top: 0; /* Fix it to the top of the viewport */
+  left: 0; /* Align it to the left */
+  right: 0; /* Align it to the right */
+}
+
+.navbar__logo {
+  width: 100%;
+}
+
+.navbar__title {
+  font-size: 36px;
+  font-weight: bold;
+  color: #0049f3;
+}
+
+.navbar__list {
+  display: flex;
+  list-style-type: none;
+  gap: 40px;
+  font-size: 18px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.navbar__list-item {
+  transition: color 0.4s ease;
+}
+
+.navbar__list-item:hover {
+  color: #0049f3;
+  cursor: pointer;
+}
+
+.navbar__search-icon-container {
+  position: relative; /* Contenedor relativo para posicionar el ícono */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 300px;
+}
+
+.navbar__search {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.navbar__search-input {
+  font-size: 16px;
+  font-weight: 400;
+  padding: 10px 10px 10px 45px;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 300px;
+  border-color: rgba(0, 0, 0, 0.1);
+  transition: border-color 0.5s ease;
+}
+
+.navbar__search-input:focus {
+  outline: none;
+  border-color: #0049f3;
+}
+.navbar__search-input::placeholder {
+  font-size: 16px;
+  font-weight: 400;
+}
+.navbar__search-icon {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  left: 10px;
+}
+
+.navbar__cart-button {
+  padding: 10px;
+  background: none;
+  border-radius: 5px;
+  border-color: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.4s ease;
+}
+
+.navbar__cart-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
