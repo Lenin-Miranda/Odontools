@@ -73,8 +73,9 @@
 }
 
 .categories__description {
+  color: #858585;
   font-weight: 400;
   font-size: 24px;
   margin: 0;
-  margin-top: 20px;
+  margin-top: 5px;
 }

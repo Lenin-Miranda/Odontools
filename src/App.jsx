@@ -6,14 +6,26 @@ import "./App.css";
 import { products } from "./data/productsData";
 import { categories } from "./data/categoriesData";
 function App() {
-  const [count, setCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+  const [isFavorite, setIsfavorite] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
+  const toggleFavorite = (productId) => {
+    setIsfavorite((prev) => !prev);
+  };
   return (
     <div className="app">
       <Header>
         <NavBar />
       </Header>
-      <Main categories={categories} products={products} />
+      <Main
+        categories={categories}
+        products={products}
+        isFavorite={isFavorite}
+        toggleFavorite={toggleFavorite}
+      />
     </div>
   );
 }
