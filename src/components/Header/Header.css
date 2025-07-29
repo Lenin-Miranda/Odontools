@@ -8,6 +8,9 @@
 }
 
 .header__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
   padding: 20px 80px 30px 30px;
 }
 

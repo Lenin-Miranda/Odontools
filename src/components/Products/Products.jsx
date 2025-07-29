@@ -1,6 +1,6 @@
 import "./Products.css";
 import { useState } from "react";
-
+import star from "../../assets/star.png";
 export default function Products({ products, isFavorite, toggleFavorite }) {
   const specialProducts = products.filter((product) => product.isFavorite);
 
@@ -16,7 +16,18 @@ export default function Products({ products, isFavorite, toggleFavorite }) {
         <div className="products__list-container">
           <p className="products__list-categorie">{product.categorie}</p>
           <h3 className="products__list-name">{product.name}</h3>
-          <p className="products__list-price">${product.price}</p>
+          <div className="products__list-reviews">
+            <img className="products__list-img" src={star} />
+            <p className="products__list-reviews-count">
+              {product.rating} ({product.reviews})
+            </p>
+          </div>
+          <div className="products__list-price-container">
+            <p className="products__list-price">${product.price}</p>
+            <p className="products__list-price products__list-price_type-discount">
+              ${product.discountedPrice(Math.round(product.price))}
+            </p>
+          </div>
 
           <button className="products__list-button">Agregar al carrito</button>
         </div>

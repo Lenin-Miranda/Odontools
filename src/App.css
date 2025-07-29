@@ -32,3 +32,10 @@ section {
   width: 100%;
   box-sizing: border-box;
 }
+
+p {
+  margin: 0;
+}
+h2 {
+  margin: 0;
+}

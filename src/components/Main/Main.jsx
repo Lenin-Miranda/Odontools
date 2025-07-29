@@ -1,5 +1,6 @@
 import Categories from "../Categories/Categories";
 import Products from "../Products/Products";
+import About from "../About/About";
 import "./Main.css";
 
 export default function Main({
@@ -17,6 +18,7 @@ export default function Main({
         isFavorite={isFavorite}
         toggleFavorite={toggleFavorite}
       />
+      <About />
     </main>
   );
 }

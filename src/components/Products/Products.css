@@ -74,7 +74,7 @@
   text-align: center;
   background-color: #e3e3e3;
   margin: 0;
-  width: 100%;
+  width: 180px;
   border-radius: 50px;
   color: #000;
   padding: 8px;
@@ -86,6 +86,7 @@
   font-size: 24px;
   font-weight: 600;
 }
+
 .products__list-container {
   display: flex;
   justify-content: center;
@@ -93,11 +94,12 @@
   gap: 15px;
   text-align: left;
   padding: 20px;
-  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .products__list-button {
-  padding: 10px;
+  padding: 15px;
   background-color: #000;
   color: #fff;
   border-radius: 10px;
@@ -120,4 +122,34 @@
   background-color: #eb0202;
   padding: 2px 15px;
   border-radius: 50px;
+  transition: background-color 0.3s ease;
+}
+
+.products__list-offer:hover {
+  background-color: #555;
+}
+
+.products__list-price-container {
+  display: flex;
+  width: 100%;
+  gap: 15px;
+}
+
+.products__list-price_type-discount {
+  text-decoration: line-through;
+  color: #a8a8a8;
+  font-weight: 400;
+}
+
+.products__list-img {
+  width: 21px;
+  height: 20px;
+}
+
+.products__list-reviews {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 20px;
 }
