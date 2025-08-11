@@ -3,6 +3,7 @@
   flex-direction: row;
   width: 100%;
   padding: 40px;
+  background-color: #e0e0e042;
 }
 
 .about__container {
@@ -10,10 +11,12 @@
   flex-direction: column;
   justify-content: center;
   padding: 20px;
+  width: 100%;
 }
 .about__title {
   font-size: 36px;
   font-weight: 700;
+  width: 100%;
 }
 
 .about__subtitle {
@@ -21,17 +24,21 @@
   font-weight: 500;
   margin: 20px 0;
   color: #555;
+  width: 100%;
 }
 .about__list {
   list-style-type: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   padding: 0;
   margin: 0;
+  justify-content: center;
+  align-items: center;
 }
 
 .about__list-item {
-  width: 300px;
+  width: 100%;
+  max-width: 200px;
   height: 100px;
   display: flex;
   flex-direction: column;
@@ -46,7 +53,7 @@
 }
 
 .about__container-button {
-  margin-top: 10px;
+  margin: 20px auto 0;
   padding: 15px;
   background-color: #6152ff;
   color: #fff;
@@ -54,11 +61,28 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  width: 300px;
+  width: 100%;
+  max-width: 250px;
   transition: background-color 0.3s ease;
   border: none;
 }
 
 .about__container-button:hover {
   background-color: #3a29ef;
+}
+
+.about__container-image {
+  width: 100%;
+  height: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  object-position: center;
+}
+@media (max-width: 760px) {
+  .about {
+    flex-direction: column;
+  }
+  .about__container-button {
+    max-width: 300px;
+  }
 }

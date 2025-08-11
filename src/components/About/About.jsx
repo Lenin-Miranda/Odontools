@@ -2,7 +2,7 @@ import "./About.css";
 import perfil from "../../assets/perfil_01.jpg";
 export default function About() {
   return (
-    <section className="about">
+    <section className="about" id="about">
       <div className="about__container">
         <h2 className="about__title">Acerca de Odontools</h2>
         <p className="about__subtitle">
@@ -34,7 +34,7 @@ export default function About() {
         </button>
       </div>
       <div className="about__container">
-        <img className="aboout__container-image" src={perfil} />
+        <img className="about__container-image" src={perfil} />
       </div>
     </section>
   );

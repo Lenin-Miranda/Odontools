@@ -60,7 +60,6 @@
   object-fit: cover;
   box-sizing: border-box;
   object-position: center;
-  padding: 10px;
 }
 
 .products__list-name {

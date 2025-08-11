@@ -25,7 +25,7 @@ export default function Products({ products, isFavorite, toggleFavorite }) {
           <div className="products__list-price-container">
             <p className="products__list-price">${product.price}</p>
             <p className="products__list-price products__list-price_type-discount">
-              ${product.discountedPrice(Math.round(product.price))}
+              ${parseFloat(product.discountedPrice(product.price).toFixed(2))}
             </p>
           </div>
 

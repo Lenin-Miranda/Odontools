@@ -1,4 +1,4 @@
-import prueba from "../../assets/perfil_01.jpg";
+import prueba from "../../assets/tools/3exploradorEXD56.jpg";
 import "./Header.css";
 
 export default function Header({ children }) {
