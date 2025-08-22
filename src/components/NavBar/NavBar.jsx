@@ -6,7 +6,7 @@ import { FaBars } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { useState, useEffect } from "react";
 
-export default function NavBar() {
+export default function NavBar({ toggleCart, children }) {
   const [windowsWidth, setWindowsWidth] = useState(window.innerWidth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -59,10 +59,11 @@ export default function NavBar() {
             id="search"
           ></input>
         </div>
-        <button className="navbar__cart-button">
+        <button className="navbar__cart-button" onClick={toggleCart}>
           <FaShoppingCart />
         </button>
       </div>
+      {children}
     </nav>
   ) : (
     <nav className="navbar">
@@ -70,7 +71,7 @@ export default function NavBar() {
         <h1 className="navbar__title">OdonTools</h1>
       </div>
       <div className="navbar__search">
-        <button className="navbar__cart-button">
+        <button className="navbar__cart-button" onClick={toggleCart}>
           <FaShoppingCart />
         </button>
         <button className="navbar__burger-button" onClick={toggleMenu}>
@@ -102,6 +103,7 @@ export default function NavBar() {
           </ul>
         </div>
       )}
+      {children}
     </nav>
   );
 }

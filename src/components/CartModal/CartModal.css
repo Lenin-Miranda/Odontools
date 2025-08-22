@@ -1,0 +1,301 @@
+.cart__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 999;
+  pointer-events: none;
+  transition: background-color 0.4s ease;
+}
+
+.cart__overlay-open {
+  background-color: rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+.cart__modal {
+  width: 100%;
+  min-width: 500px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  z-index: 1000;
+  background-color: #fff;
+  opacity: 0;
+  transform: translateX(100%); /* <- inicia fuera de la pantalla */
+  pointer-events: none;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  padding: 20px;
+  box-shadow: -5px 4px 10px 0px rgba(0, 0, 0, 0.3);
+}
+
+.cart__modal-open {
+  opacity: 1;
+  transform: translateX(0); /* <- entra desde la derecha */
+  pointer-events: auto;
+}
+.cart__modal-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid #e3e3e3;
+  background-color: #fff;
+  margin: 0 0 20px;
+  padding: 0 10px 10px;
+  position: relative;
+}
+
+.cart___modal-container-btn {
+  background: none;
+  border: none;
+  width: 40px;
+  position: absolute;
+  height: 40px;
+  right: 0;
+  transition: background-color 0.5s ease;
+  border-radius: 8px;
+}
+.cart___modal-container-btn:hover {
+  background-color: #0000001e;
+}
+
+.cart__modal-container-title {
+  font-size: 20px;
+  margin: 0 0 5px;
+  font-family: "Geist", Arial, Helvetica, sans-serif;
+  font-weight: 600;
+}
+
+.cart__modal-container-subtitle {
+  margin: 0 0 10px;
+}
+
+.cart__modal-open {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.cart__modal-container-cards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px 20px;
+  width: 100%;
+  height: 100vh;
+  max-height: 500px;
+  background-color: #fff;
+  flex: 1; /* ocupa todo el espacio disponible */
+  overflow-y: auto; /* permite scroll */
+}
+
+.cart__modal-container-cards-title {
+  color: #bbbbbb;
+  font-weight: 600;
+  font-family: "Geist", Arial, Helvetica, sans-serif;
+  letter-spacing: -0.1px;
+  font-size: 18px;
+}
+
+.cart__modal-container-empty-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+.cart__modal-container-cards-icon {
+  text-align: center;
+  height: 40px;
+  font-size: 40px;
+  animation: shake 2s ease-in-out infinite;
+  animation-delay: 5s;
+  animation-fill-mode: forwards;
+  color: #bbbbbb;
+}
+
+.cart__modal-container-cards-button {
+  padding: 13px 13px;
+  border-radius: 8px;
+  border: none;
+  background-color: #000;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.3s ease-in;
+}
+
+.cart__modal-container-cards-button:hover {
+  opacity: 0.8;
+}
+
+.cart__modal-container-list {
+  width: 100%;
+  height: 100%;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cart__modal-container-list-item {
+  border: 1px solid #ccc;
+  width: 100%;
+  height: 200px;
+  padding: 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  gap: 20px;
+}
+.cart__modal-container-list-item:hover {
+  -webkit-box-shadow: 0px 10px 10px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 10px 10px -8px rgba(0, 0, 0, 0.75);
+}
+.cart__modal-container-list-item-l {
+  width: 100%;
+  max-width: 80px;
+}
+
+.cart__modal-container-list-item-l-image {
+  width: 100%;
+  max-width: 80px;
+  height: 80px;
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+.cart__modal-container-list-item-r {
+  width: 100%;
+}
+
+.cart__modal-container-list-item-r-container {
+  display: flex;
+  margin: 10px 0 0;
+  justify-content: space-between;
+}
+.cart__modal-container-list-item-r-container-price {
+  font-weight: 600;
+  color: #0049f3;
+  font-size: 24px;
+  font-family: "Geist", Arial, Helvetica, sans-serif;
+}
+
+.cart__modal-container-list-item-r-container-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  border-radius: 8px;
+}
+.cart__modal-container-list-item-r-container-delete:hover {
+  background-color: #9f000023;
+}
+
+.cart__modal-container-list-item-r-title {
+  font-family: "Geist", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 5px;
+}
+
+.cart__modal-container-list-item-r-categorie {
+  font-family: "Geist", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px;
+  background-color: #cccccc5b;
+  border-radius: 15px;
+  width: 100%;
+}
+
+.cart__modal-container-list-item-r-container-increment {
+  width: 150px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #bbbbbb15;
+  height: 35px;
+  border-radius: 8px;
+  margin: 10px 0 0;
+  padding: 5px;
+}
+.cart__modal-container-list-item-r-container-increment-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: none;
+  text-align: center;
+  font-size: 20px;
+  padding: 6px;
+  transition: background-color 0.2s ease-in;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.cart__modal-container-list-item-r-container-increment-button:hover {
+  background-color: #fff;
+}
+.cart__modal-container-list-item-r-container-increment-count {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.cart__modal-container-total {
+  margin: 20px 0 0 0;
+  padding: 20px;
+  border-top: 1px solid #bbbbbb;
+}
+
+.cart__modal-container-total-products {
+  border-bottom: 1px solid #bbbbbb;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+  font-size: 14px;
+  font-family: "Geist", Arial, Helvetica, sans-serif;
+}
+
+.cart__modal-container-total-products-total {
+  font-weight: 400;
+}
+.cart__modal-container-payment {
+  display: flex;
+  margin: 10px 0 0;
+  flex-direction: column;
+  width: 100%;
+}
+
+.cart__modal-container-payment-total {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Geist", Arial, Helvetica, sans-serif;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-2px);
+  }
+  40%,
+  80% {
+    transform: translateX(2px);
+  }
+}
