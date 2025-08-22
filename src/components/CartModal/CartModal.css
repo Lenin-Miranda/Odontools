@@ -59,6 +59,7 @@
   right: 0;
   transition: background-color 0.5s ease;
   border-radius: 8px;
+  cursor: pointer;
 }
 .cart___modal-container-btn:hover {
   background-color: #0000001e;
@@ -75,11 +76,6 @@
   margin: 0 0 10px;
 }
 
-.cart__modal-open {
-  opacity: 1;
-  transform: translateX(0);
-  pointer-events: auto;
-}
 .cart__modal-container-cards {
   display: flex;
   align-items: center;
@@ -179,13 +175,13 @@
 
 .cart__modal-container-list-item-r-container {
   display: flex;
-  margin: 10px 0 0;
+  margin: 15px 0 0;
   justify-content: space-between;
 }
 .cart__modal-container-list-item-r-container-price {
   font-weight: 600;
   color: #0049f3;
-  font-size: 24px;
+  font-size: 20px;
   font-family: "Geist", Arial, Helvetica, sans-serif;
 }
 
@@ -225,7 +221,6 @@
   background-color: #bbbbbb15;
   height: 35px;
   border-radius: 8px;
-  margin: 10px 0 0;
   padding: 5px;
 }
 .cart__modal-container-list-item-r-container-increment-button {
@@ -267,6 +262,7 @@
   gap: 10px;
   font-size: 14px;
   font-family: "Geist", Arial, Helvetica, sans-serif;
+  padding-bottom: 10px;
 }
 
 .cart__modal-container-total-products-total {
@@ -277,12 +273,47 @@
   margin: 10px 0 0;
   flex-direction: column;
   width: 100%;
+  gap: 20px;
 }
 
 .cart__modal-container-payment-total {
   display: flex;
   justify-content: space-between;
   font-family: "Geist", Arial, Helvetica, sans-serif;
+}
+.cart__modal-container-payment-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cart__modal-container-payment-button {
+  border: none;
+  padding: 12px 15px;
+  border-radius: 8px;
+  background-color: #2844fff0;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cart__modal-container-payment-button:hover {
+  background-color: #004cff;
+}
+
+.cart__modal-container-payment-text {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+.cart__modal-container-payment-dot {
+  border-radius: 50%;
+  background-color: #00b527;
+  width: 12px;
+  height: 12px;
 }
 
 @keyframes shake {

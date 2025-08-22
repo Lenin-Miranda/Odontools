@@ -7,7 +7,11 @@ export default function ProductsCard({ products }) {
   const productsList = products.map((product) => {
     return (
       <li className="products__list-item" key={product.id}>
-        <span className="products__list-offer">Oferta</span>
+        {product.discount ? (
+          <span className="products__list-offer">Oferta</span>
+        ) : (
+          ""
+        )}
         <img
           className="products__list-image"
           src={product.image}
@@ -24,9 +28,13 @@ export default function ProductsCard({ products }) {
           </div>
           <div className="products__list-price-container">
             <p className="products__list-price">${product.price}</p>
-            <p className="products__list-price products__list-price_type-discount">
-              ${parseFloat(product.discountedPrice(product.price).toFixed(2))}
-            </p>
+            {product.discount ? (
+              <p className="products__list-price products__list-price_type-discount">
+                ${parseFloat(product.discountedPrice(product.price).toFixed(2))}
+              </p>
+            ) : (
+              ""
+            )}
           </div>
 
           <button

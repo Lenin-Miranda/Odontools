@@ -47,7 +47,7 @@ function App() {
       </NavBar>
 
       <Routes>
-        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products" element={<ProductsPage items={products} />} />
 
         <Route
           path="/"

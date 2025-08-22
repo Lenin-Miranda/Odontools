@@ -33,7 +33,10 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
       >
         <div className="cart__modal-container">
           <h1 className="cart__modal-container-title">Carrito de compras</h1>
-          <p className="cart__modal-container-subtitle">
+          <p
+            className="cart__modal-container-subtitle"
+            style={{ fontWeight: "600", opacity: ".5" }}
+          >
             {totalQuantity} Productos
           </p>
           <button className="cart___modal-container-btn" onClick={closeCart}>
@@ -54,7 +57,10 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
               <h1 className="cart__modal-container-cards-title">
                 Tu carrito esta vacio
               </h1>
-              <button className="cart__modal-container-cards-button">
+              <button
+                className="cart__modal-container-cards-button"
+                onClick={closeCart}
+              >
                 Continuar comprando
               </button>
             </div>
@@ -133,12 +139,13 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
                               fontWeight: "500",
                               textAlign: "right",
                               padding: "0 0 0 10px",
+                              opacity: "0.5",
                             }}
                           >
                             Subtotal
                           </span>
 
-                          <span style={{ fontSize: "18px", fontWeight: "600" }}>
+                          <span style={{ fontSize: "16px", fontWeight: "600" }}>
                             ${item.subtotal.toFixed(2)}
                           </span>
                         </div>
@@ -194,6 +201,28 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
                   {cartTotal > 100
                     ? cartTotal.toFixed(2)
                     : cartTotal.toFixed(2) + 10}
+                </span>
+              </div>
+              <div className="cart__modal-container-payment-buttons">
+                <button className="cart__modal-container-payment-button">
+                  Proceder al pago
+                </button>
+                <button
+                  className="cart__modal-container-payment-button"
+                  onClick={closeCart}
+                  style={{
+                    color: "#000",
+                    backgroundColor: "#fff",
+                    border: "1px solid ",
+                  }}
+                >
+                  Continuar comprando
+                </button>
+              </div>
+              <div className="cart__modal-container-payment-text">
+                <div className="cart__modal-container-payment-dot"></div>
+                <span style={{ opacity: "0.5", fontWeight: "600" }}>
+                  Compra 100% segura y protegida
                 </span>
               </div>
             </div>
