@@ -44,14 +44,39 @@ export default function SearchBar() {
         value={query}
         onChange={handleSearch}
       ></input>
-      <div className="seachbar__container">
+      <div
+        className={`searchbar__container ${
+          results.length > 0 ? "searchbar__open" : ""
+        }`}
+      >
         {results.map((item) => (
           <div
             key={item.id}
             onClick={() => handleSelect(item.id)}
             className="searchbar__containter-products"
           >
-            {item.name}
+            <img
+              src={item.image}
+              alt={item.name}
+              className="searchbar__container-img"
+            />
+            <div className="searchbar__container-text">
+              <p
+                className="searchbar__container-title"
+                style={{ fontWeight: "600", fontSize: "14px" }}
+              >
+                {item.name}
+              </p>
+              <p
+                className="searchbar__container-title"
+                style={{ fontSize: "12px", opacity: "0.4", fontWeight: "600" }}
+              >
+                {item.categorie}
+              </p>
+            </div>
+            <p className="searchbar__container-price">
+              ${item.price.toFixed(2)}
+            </p>
           </div>
         ))}
       </div>

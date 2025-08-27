@@ -6,7 +6,7 @@ import App from "./App.jsx";
 import { CartProvider } from "./hooks/UseCart.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  <StrictMode basename="/Odontools/">
     <BrowserRouter>
       <CartProvider>
         <App />

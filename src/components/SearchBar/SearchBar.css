@@ -1,0 +1,50 @@
+.searchbar__container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: absolute;
+  top: 45px;
+  padding: 20px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  overflow-x: scroll;
+  max-height: 370px;
+}
+
+.searchbar__open {
+  opacity: 1;
+}
+
+.searchbar__containter-products {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.searchbar__container-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+.searchbar__container-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+}
+
+.searchbar__container-title {
+  text-align: left;
+  font-family: "Geist", Arial, Helvetica, sans-serif;
+}
+
+.searchbar__container-price {
+  font-weight: 600;
+  font-size: 16px;
+  color: #0049f3;
+}
