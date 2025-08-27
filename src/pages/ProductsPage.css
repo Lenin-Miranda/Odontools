@@ -17,6 +17,7 @@
   flex-direction: row;
   gap: 30px;
   align-items: center;
+  border-bottom: 1px solid #00000036;
 }
 
 .products__searchbar-title {
@@ -93,6 +94,9 @@
 
 .products__searchbar-cards {
   padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .products__searchbar-elements-list-item {

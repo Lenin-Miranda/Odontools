@@ -4,6 +4,19 @@ import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaCheck } from "react-icons/fa";
 import ProductsCard from "../components/ProductsCard/ProductsCard";
+import {
+  sortByPriceAsc,
+  sortByPriceDesc,
+  sortByName,
+  sortByRating,
+} from "../utils/sortTypes/sortTypes";
+import {
+  filterOnSale,
+  filterInStock,
+  filterByRatingAbove,
+  filterAll,
+} from "../utils/filterTypes/filterTypes.js";
+
 export default function ProductsPage({ items }) {
   const [isSearch, setIsSearch] = useState("");
   const [openMenu, setOpenMenu] = useState(null);
@@ -12,19 +25,40 @@ export default function ProductsPage({ items }) {
 
   const filter = [
     { id: 1, name: "Todas" },
-    { id: 2, name: "Equipos Dentales" },
-    { id: 3, name: "Instrumentos" },
-    { id: 4, name: "Materiales" },
-    { id: 5, name: "Imagenologia" },
+    { id: 2, name: "En stock" },
+    { id: 3, name: "En oferta" },
+    { id: 4, name: "Mejor valorados" },
   ];
   const sort = [
     { id: 1, name: "Nombre A-Z" },
     { id: 2, name: "Precio: Menor a Mayor" },
     { id: 3, name: "Precio: Mayor a Menor" },
-    { id: 4, name: "Mejor Valorados" },
+    { id: 4, name: "Mejor valorados" },
   ];
 
-  console.log(sortOption);
+  const getFilteredAndSortedProducts = () => {
+    let filtered = searchFunction();
+
+    if (filterOption === "En stock") filtered = filterInStock(filtered);
+    else if (filterOption === "En oferta") filtered = filterOnSale(filtered);
+    else if (filterOption === "Mejor valorados")
+      filtered = filterByRatingAbove(filtered);
+
+    if (sortOption === "Nombre A-Z") return sortByName(filtered);
+    if (sortOption === "Precio: Menor a Mayor") return sortByPriceAsc(filtered);
+    if (sortOption === "Precio: Mayor a Menor")
+      return sortByPriceDesc(filtered);
+    if (sortOption === "Mejor valorados") return sortByRating(filtered);
+
+    return filtered;
+  };
+
+  const searchFunction = () => {
+    const query = isSearch.toLowerCase();
+    return items.filter((item) => {
+      return item.name.toLowerCase().includes(query);
+    });
+  };
 
   return (
     <section className="products__page">
@@ -142,7 +176,7 @@ export default function ProductsPage({ items }) {
           </div>
         </div>
         <div className="products__searchbar-cards">
-          <ProductsCard products={items} />
+          <ProductsCard products={getFilteredAndSortedProducts()} />
         </div>
       </div>
     </section>

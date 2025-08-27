@@ -1,10 +1,11 @@
 import "./Navbar.css";
 import { FaShoppingCart } from "react-icons/fa";
-import search from "../../assets/search.png";
+
 import { Link } from "react-scroll";
 import { FaBars } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { useState, useEffect } from "react";
+import SearchBar from "../Searchbar/SearchBar";
 
 export default function NavBar({ toggleCart, children }) {
   const [windowsWidth, setWindowsWidth] = useState(window.innerWidth);
@@ -29,7 +30,9 @@ export default function NavBar({ toggleCart, children }) {
   return windowsWidth >= 761 ? (
     <nav className="navbar">
       <div className="navbar__logo">
-        <h1 className="navbar__title">OdonTools</h1>
+        <button to="home" className="navbar__title">
+          OdonTools
+        </button>
       </div>
       <ul className="navbar__list">
         <li className="navbar__list-item">
@@ -49,16 +52,7 @@ export default function NavBar({ toggleCart, children }) {
         </li>
       </ul>
       <div className="navbar__search">
-        <div className="navbar__search-icon-container">
-          <img className="navbar__search-icon" src={search} alt="Search Icon" />
-          <label className="navbar__search-label" htmlFor="search"></label>
-          <input
-            className="navbar__search-input"
-            placeholder={`Buscar productos...`}
-            type="text"
-            id="search"
-          ></input>
-        </div>
+        <SearchBar />
         <button className="navbar__cart-button" onClick={toggleCart}>
           <FaShoppingCart />
         </button>

@@ -7,11 +7,16 @@ export default function ProductsCard({ products }) {
   const productsList = products.map((product) => {
     return (
       <li className="products__list-item" key={product.id}>
-        {product.discount ? (
+        {product.stock === 0 ? (
+          <span
+            className="products__list-offer"
+            style={{ backgroundColor: "#ccc", color: "#000" }}
+          >
+            Agotado
+          </span>
+        ) : product.discount ? (
           <span className="products__list-offer">Oferta</span>
-        ) : (
-          ""
-        )}
+        ) : null}
         <img
           className="products__list-image"
           src={product.image}
@@ -27,13 +32,22 @@ export default function ProductsCard({ products }) {
             </p>
           </div>
           <div className="products__list-price-container">
-            <p className="products__list-price">${product.price}</p>
             {product.discount ? (
-              <p className="products__list-price products__list-price_type-discount">
-                ${parseFloat(product.discountedPrice(product.price).toFixed(2))}
-              </p>
+              <>
+                <p className="products__list-price">
+                  $
+                  {parseFloat(
+                    product.discountedPrice(product.price).toFixed(2)
+                  )}
+                </p>
+                <p className="products__list-price products__list-price_type-discount">
+                  ${product.price.toFixed(2)}
+                </p>
+              </>
             ) : (
-              ""
+              <p className="products__list-price">
+                ${product.price.toFixed(2)}
+              </p>
             )}
           </div>
 

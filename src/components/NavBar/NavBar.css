@@ -25,6 +25,11 @@
   color: #0049f3;
   text-align: center;
   width: 100%;
+  background: none;
+  border: none;
+  height: 48px;
+  cursor: pointer;
+  font-family: "Geist", Arial, Helvetica, sans-serif;
 }
 
 .navbar__list {
