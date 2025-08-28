@@ -200,5 +200,11 @@
   .navbar__list-item {
     font-weight: 500;
     opacity: 0.8;
+    width: 100%;
+    text-align: left;
+  }
+  .small {
+    width: 100%;
+    max-width: 100%;
   }
 }

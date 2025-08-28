@@ -132,6 +132,31 @@ export default function NavBar({
             <li className="navbar__list-item">
               <Link to="contact">Contacto</Link>
             </li>
+            {!isLoggedIn && (
+              <>
+                {" "}
+                <li className="navbar__list-item">
+                  <button
+                    className={`navbar__login-button ${
+                      windowsWidth < 761 ? "small" : ""
+                    }`}
+                    onClick={handleLogin}
+                  >
+                    Iniciar Sesion
+                  </button>
+                </li>
+                <li className="navbar__list-item">
+                  <button
+                    className={`navbar__signup-button ${
+                      windowsWidth < 761 ? "small" : ""
+                    }`}
+                    onClick={handleSignUp}
+                  >
+                    Registrate
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       )}

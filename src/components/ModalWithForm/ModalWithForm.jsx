@@ -5,11 +5,24 @@ export default function ModalWithForm({ children, setIsClose, isOpen }) {
     setIsClose(false);
   };
 
+  const modalCloseOverlay = (e) => {
+    if (e.target.className === "modal modal__open") {
+      setIsClose(false);
+    }
+  };
+
   return (
-    <div className={`modal ${isOpen ? "modal__open" : ""}`}>
+    <div
+      onClick={modalCloseOverlay}
+      className={`modal ${isOpen ? "modal__open" : ""}`}
+    >
       <form className={`modal__form `}>
         {" "}
-        <button className="modal__form-close-btn" onClick={handleClose}>
+        <button
+          className="modal__form-close-btn"
+          onClick={handleClose}
+          type="button"
+        >
           <IoClose style={{ fontSize: "24px" }} />
         </button>
         {children}
