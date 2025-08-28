@@ -6,11 +6,11 @@ import App from "./App.jsx";
 import { CartProvider } from "./hooks/UseCart.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode basename="/Odontools/">
-    <BrowserRouter>
+  <BrowserRouter basename="/Odontools">
+    <StrictMode>
       <CartProvider>
         <App />
       </CartProvider>
-    </BrowserRouter>
-  </StrictMode>
+    </StrictMode>
+  </BrowserRouter>
 );

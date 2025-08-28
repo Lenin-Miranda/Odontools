@@ -43,6 +43,7 @@ export default function SearchBar() {
         id="search"
         value={query}
         onChange={handleSearch}
+        autoComplete="off"
       ></input>
       <div
         className={`searchbar__container ${
