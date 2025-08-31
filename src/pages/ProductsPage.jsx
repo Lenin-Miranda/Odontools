@@ -138,10 +138,9 @@ export default function ProductsPage({ items }) {
               ))}
             </ul>
             <ul
-              className={`products__searchbar-elements-list ${
+              className={`products__searchbar-elements-list products__searchbar-elements-list_type-sort ${
                 openMenu === "sort" ? "list-open" : ""
               }`}
-              style={{ left: "220px" }}
             >
               {sort.map((item) => (
                 <li

@@ -103,4 +103,8 @@
   .header__image-container {
     max-width: 100%;
   }
+  .header__hero-buttons-container {
+    flex-direction: column;
+    width: 100%;
+  }
 }

@@ -13,10 +13,12 @@ import ProductsCard from "./components/ProductsCard/ProductsCard";
 import espejoBlack from "./assets/tools/1espejoBLACKLINE.jpg";
 import { useCart } from "./hooks/UseCart";
 import ModalWithForm from "./components/ModalWithForm/ModalWithForm";
+import UserModal from "./components/UserModal/UserModal";
+import { users } from "./data/clientsData";
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [cartItems, setCartItems] = useState([]);
   const [isFavorite, setIsfavorite] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -29,6 +31,7 @@ function App() {
     email: "",
     password: "",
   });
+  const [isUserOpen, setIsUserOpen] = useState(false);
 
   const toggleFavorite = (productId) => {
     setIsfavorite((prev) => !prev);
@@ -49,6 +52,7 @@ function App() {
         isLoggedIn={isLoggedIn}
         setIsLogginOpen={setIsLogginOpen}
         setIsSignUpOpen={setIsSignUpOpen}
+        setIsUserOpen={setIsUserOpen}
       >
         <CartModal
           isCartOpen={isCartOpen}
@@ -57,6 +61,11 @@ function App() {
         >
           <ProductsCard products={products} />
         </CartModal>
+        <UserModal
+          isUserOpen={isUserOpen}
+          setIsUserOpen={setIsUserOpen}
+          user={users}
+        />
       </NavBar>
       <ModalWithForm setIsClose={setIsLogginOpen} isOpen={isLogginOpen}>
         <h2 className="modal__form-title">Iniciar Sesion</h2>

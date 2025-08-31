@@ -1,5 +1,7 @@
 import prueba from "../../assets/tools/3exploradorEXD56.jpg";
 import "./Header.css";
+import { NavLink } from "react-router-dom";
+import { Link } from "react-scroll";
 
 export default function Header({ children }) {
   return (
@@ -16,12 +18,21 @@ export default function Header({ children }) {
             excelencia desde 1995.
           </p>
           <div className="header__hero-buttons-container">
-            <button className="header__hero-button header__hero-button_type-l">
+            <Link
+              className="header__hero-button header__hero-button_type-l"
+              to="products"
+              smooth={true}
+              duration={500}
+            >
               Comprar Ahora
-            </button>
-            <button className="header__hero-button header__hero-button_type-r">
+            </Link>
+
+            <NavLink
+              to="/products"
+              className="header__hero-button header__hero-button_type-r"
+            >
               Ver Catalogo
-            </button>
+            </NavLink>
           </div>
         </div>
         <div className="header__image-container">

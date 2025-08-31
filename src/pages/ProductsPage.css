@@ -113,6 +113,9 @@
   transform: translateY(0);
   opacity: 1;
 }
+.products__searchbar-elements-list_type-sort {
+  left: 220px;
+}
 
 @media screen and (max-width: 760px) {
   .products__searchbar-elements {
@@ -131,6 +134,10 @@
   }
   .products__searchbar-elements-button {
     width: 100%;
-    justify-content: center;
+  }
+
+  .products__searchbar-elements-list_type-sort {
+    left: 0;
+    top: 140px;
   }
 }

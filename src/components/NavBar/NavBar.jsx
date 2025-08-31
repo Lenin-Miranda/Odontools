@@ -8,6 +8,8 @@ import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import SearchBar from "../Searchbar/SearchBar";
 import { useCart } from "../../hooks/UseCart";
+import { CiUser } from "react-icons/ci";
+import { useLocation } from "react-router-dom";
 
 export default function NavBar({
   toggleCart,
@@ -15,7 +17,9 @@ export default function NavBar({
   isLoggedIn,
   setIsLogginOpen,
   setIsSignUpOpen,
+  setIsUserOpen,
 }) {
+  const location = useLocation();
   const { totalQuantity } = useCart();
   const [windowsWidth, setWindowsWidth] = useState(window.innerWidth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,6 +29,10 @@ export default function NavBar({
   };
   const handleSignUp = () => {
     setIsSignUpOpen(true);
+  };
+
+  const handleUserOpen = () => {
+    setIsUserOpen(true);
   };
 
   useEffect(() => {
@@ -71,7 +79,14 @@ export default function NavBar({
       </ul>
       {isLoggedIn ? (
         <div className="navbar__search">
-          <SearchBar />
+          {location.pathname !== "/products" && <SearchBar />}
+          <button
+            className="navbar__user-button"
+            type="button"
+            onClick={handleUserOpen}
+          >
+            <CiUser />
+          </button>
           <button className="navbar__cart-button" onClick={toggleCart}>
             <FaShoppingCart />
             <span className="navbar__cart-quantity">
@@ -100,12 +115,25 @@ export default function NavBar({
   ) : (
     <nav className="navbar">
       <div className="navbar__logo">
-        <h1 className="navbar__title">OdonTools</h1>
+        <NavLink to="/" className="navbar__title">
+          OdonTools
+        </NavLink>
       </div>
       <div className="navbar__search">
+        <button
+          className="navbar__user-button"
+          type="button"
+          onClick={handleUserOpen}
+        >
+          <CiUser />
+        </button>
         <button className="navbar__cart-button" onClick={toggleCart}>
           <FaShoppingCart />
+          <span className="navbar__cart-quantity">
+            {totalQuantity > 99 ? "+99" : totalQuantity}
+          </span>
         </button>
+
         <button className="navbar__burger-button" onClick={toggleMenu}>
           {isMenuOpen === false ? (
             <FaBars />
@@ -114,52 +142,56 @@ export default function NavBar({
           )}
         </button>
       </div>
-      {isMenuOpen && (
-        <div className={`navbar__modal`}>
-          <ul className="navbar__list">
-            <li className="navbar__list-item">
-              <Link to="home">Inicio</Link>
-            </li>
-            <li className="navbar__list-item">
-              <Link to="products">Productos</Link>
-            </li>
-            <li className="navbar__list-item">
-              <Link to="categories">Categorias</Link>
-            </li>
-            <li className="navbar__list-item">
-              <Link to="about">Nosotros</Link>
-            </li>
-            <li className="navbar__list-item">
-              <Link to="contact">Contacto</Link>
-            </li>
-            {!isLoggedIn && (
-              <>
-                {" "}
-                <li className="navbar__list-item">
-                  <button
-                    className={`navbar__login-button ${
-                      windowsWidth < 761 ? "small" : ""
-                    }`}
-                    onClick={handleLogin}
-                  >
-                    Iniciar Sesion
-                  </button>
-                </li>
-                <li className="navbar__list-item">
-                  <button
-                    className={`navbar__signup-button ${
-                      windowsWidth < 761 ? "small" : ""
-                    }`}
-                    onClick={handleSignUp}
-                  >
-                    Registrate
-                  </button>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
-      )}
+
+      <div
+        className={`navbar__modal ${isMenuOpen ? "navbar__modal-open" : ""}`}
+      >
+        <ul className="navbar__list">
+          <li className="navbar__list-item">
+            <Link to="home">Inicio</Link>
+          </li>
+          <li className="navbar__list-item">
+            <NavLink style={{ textDecoration: "none" }} to="/products">
+              Productos
+            </NavLink>
+          </li>
+          <li className="navbar__list-item">
+            <Link to="categories">Categorias</Link>
+          </li>
+          <li className="navbar__list-item">
+            <Link to="about">Nosotros</Link>
+          </li>
+          <li className="navbar__list-item">
+            <Link to="contact">Contacto</Link>
+          </li>
+          {!isLoggedIn && (
+            <>
+              {" "}
+              <li className="navbar__list-item">
+                <button
+                  className={`navbar__login-button ${
+                    windowsWidth < 761 ? "small" : ""
+                  }`}
+                  onClick={handleLogin}
+                >
+                  Iniciar Sesion
+                </button>
+              </li>
+              <li className="navbar__list-item">
+                <button
+                  className={`navbar__signup-button ${
+                    windowsWidth < 761 ? "small" : ""
+                  }`}
+                  onClick={handleSignUp}
+                >
+                  Registrate
+                </button>
+              </li>
+            </>
+          )}
+        </ul>
+      </div>
+
       {children}
     </nav>
   );
