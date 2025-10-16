@@ -13,7 +13,9 @@ import ProductsCard from "./components/ProductsCard/ProductsCard";
 import espejoBlack from "./assets/tools/1espejoBLACKLINE.jpg";
 import { useCart } from "./hooks/UseCart";
 import ModalWithForm from "./components/ModalWithForm/ModalWithForm";
+import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import UserModal from "./components/UserModal/UserModal";
+
 import { users } from "./data/clientsData";
 
 function App() {
@@ -175,6 +177,7 @@ function App() {
           }
         />
         <Route path="/products" element={<ProductsPage items={products} />} />
+        <Route path="/adminDashboard" element={<AdminDashboard />} />
       </Routes>
       <Footer />
     </div>

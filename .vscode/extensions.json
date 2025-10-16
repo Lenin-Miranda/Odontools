@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-json",
+    "ritwickdey.liveserver",
+    "yzhang.markdown-all-in-one",
+    "ms-vscode.vscode-npm-script",
+    "gruntfuggly.todo-tree",
+    "streetsidesoftware.code-spell-checker",
+    "usernamehw.errorlens",
+    "wix.vscode-import-cost",
+    "ms-vscode.vscode-react-javascript-snippets"
+  ]
+}
