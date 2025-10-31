@@ -1,10 +1,10 @@
 import search from "../../assets/search.png";
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
-import { products } from "../../data/productsData";
+
 import "./SearchBar.css";
 
-export default function SearchBar() {
+export default function SearchBar({ products }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
 

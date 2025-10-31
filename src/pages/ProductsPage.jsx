@@ -4,6 +4,8 @@ import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaCheck } from "react-icons/fa";
 import ProductsCard from "../components/ProductsCard/ProductsCard";
+import { useEffect } from "react";
+import { useProducts } from "../hooks/useProducts.js";
 import {
   sortByPriceAsc,
   sortByPriceDesc,
@@ -18,10 +20,20 @@ import {
 } from "../utils/filterTypes/filterTypes.js";
 
 export default function ProductsPage({ items }) {
+  // ✅ Hook llamado DENTRO del componente
+  const {
+    fetchProducts,
+    products: hookProducts,
+    loading: hookLoading,
+    error: hookError,
+  } = useProducts();
   const [isSearch, setIsSearch] = useState("");
   const [openMenu, setOpenMenu] = useState(null);
   const [sortOption, setSortOption] = useState("Nombre A-Z");
   const [filterOption, setFilterOption] = useState("Todas");
+  const [message, setMessage] = useState("");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const filter = [
     { id: 1, name: "Todas" },
@@ -35,6 +47,28 @@ export default function ProductsPage({ items }) {
     { id: 3, name: "Precio: Mayor a Menor" },
     { id: 4, name: "Mejor valorados" },
   ];
+
+  useEffect(() => {
+    // Cargar productos al montar el componente
+    fetchProducts();
+  }, [products]);
+
+  // Sincronizar productos del hook con estado local
+  useEffect(() => {
+    if (hookProducts.length > 0) {
+      setProducts(hookProducts);
+      setLoading(false);
+    }
+  }, [hookProducts]);
+
+  // Manejar errores del hook
+  useEffect(() => {
+    if (hookError) {
+      setMessage(hookError);
+      setTimeout(() => setMessage(""), 3000);
+      setLoading(false);
+    }
+  }, [hookError]);
 
   const getFilteredAndSortedProducts = () => {
     let filtered = searchFunction();
@@ -55,8 +89,8 @@ export default function ProductsPage({ items }) {
 
   const searchFunction = () => {
     const query = isSearch.toLowerCase();
-    return items.filter((item) => {
-      return item.name.toLowerCase().includes(query);
+    return products.filter((product) => {
+      return product.name.toLowerCase().includes(query);
     });
   };
 
@@ -175,7 +209,45 @@ export default function ProductsPage({ items }) {
           </div>
         </div>
         <div className="products__searchbar-cards">
-          <ProductsCard products={getFilteredAndSortedProducts()} />
+          {loading ? (
+            <div className="products__loading">
+              <p>Cargando productos...</p>
+            </div>
+          ) : message ? (
+            <div className="products__error">
+              <p>{message}</p>
+            </div>
+          ) : (
+            <div className="products__filter-container">
+              {/* Mostrar información de filtros activos */}
+              {(isSearch ||
+                filterOption !== "Todas" ||
+                sortOption !== "Nombre A-Z") && (
+                <div className="products__filter-info">
+                  <p>
+                    {getFilteredAndSortedProducts().length} producto(s)
+                    encontrado(s)
+                    {isSearch && ` para "${isSearch}"`}
+                    {filterOption !== "Todas" && ` • Filtro: ${filterOption}`}
+                    {sortOption !== "Nombre A-Z" && ` • Orden: ${sortOption}`}
+                  </p>
+                  {(isSearch || filterOption !== "Todas") && (
+                    <button
+                      className="products__clear-filters"
+                      onClick={() => {
+                        setIsSearch("");
+                        setFilterOption("Todas");
+                        setSortOption("Nombre A-Z");
+                      }}
+                    >
+                      Limpiar filtros
+                    </button>
+                  )}
+                </div>
+              )}
+              <ProductsCard products={getFilteredAndSortedProducts()} />
+            </div>
+          )}
         </div>
       </div>
     </section>

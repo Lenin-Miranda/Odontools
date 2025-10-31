@@ -13,13 +13,8 @@ export default function Main({
 }) {
   return (
     <main className="main">
-      <Header />
       <Categories categories={categories} products={products} />
-      <Products
-        products={products}
-        isFavorite={isFavorite}
-        toggleFavorite={toggleFavorite}
-      />
+      <Products isFavorite={isFavorite} toggleFavorite={toggleFavorite} />
       <About />
       <Contact />
     </main>

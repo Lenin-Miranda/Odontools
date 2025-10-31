@@ -215,6 +215,23 @@
   background-color: #0031c6;
 }
 
+/* Estilos para el enlace de Admin */
+.navbar__list-item a[href="/admin"] {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.navbar__list-item a[href="/admin"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a6fd8 0%, #6b4190 100%);
+}
+
 @media (max-width: 760px) {
   .navbar__list {
     position: relative;

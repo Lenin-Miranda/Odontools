@@ -15,6 +15,7 @@ export default function NavBar({
   toggleCart,
   children,
   isLoggedIn,
+  isAdmin,
   setIsLogginOpen,
   setIsSignUpOpen,
   setIsUserOpen,
@@ -76,6 +77,13 @@ export default function NavBar({
         <li className="navbar__list-item">
           <Link to="contact">Contacto</Link>
         </li>
+        {isAdmin && (
+          <li className="navbar__list-item">
+            <NavLink style={{ textDecoration: "none" }} to="/admin">
+              Admin
+            </NavLink>
+          </li>
+        )}
       </ul>
       {isLoggedIn ? (
         <div className="navbar__search">
@@ -164,6 +172,13 @@ export default function NavBar({
           <li className="navbar__list-item">
             <Link to="contact">Contacto</Link>
           </li>
+          {isAdmin && (
+            <li className="navbar__list-item">
+              <NavLink style={{ textDecoration: "none" }} to="/admin">
+                Admin
+              </NavLink>
+            </li>
+          )}
           {!isLoggedIn && (
             <>
               {" "}
