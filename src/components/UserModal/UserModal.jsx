@@ -26,6 +26,8 @@ export default function UserModal({
   user,
   onLogout,
 }) {
+  console.log("UserModal user:", user);
+
   // Función para formatear fechas
   const formatDate = (dateString) => {
     if (!dateString) return "No disponible";

@@ -49,9 +49,9 @@ export default function ProductsPage({ items }) {
   ];
 
   useEffect(() => {
-    // Cargar productos al montar el componente
+    // Cargar productos al montar el componente SOLO UNA VEZ
     fetchProducts();
-  }, [products]);
+  }, []);
 
   // Sincronizar productos del hook con estado local
   useEffect(() => {

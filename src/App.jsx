@@ -56,8 +56,8 @@ function App() {
 
     if (savedUser && savedLoginStatus === "true") {
       try {
-        const userInfo = JSON.parse(savedUser);
-        setCurrentUser(userInfo);
+        const userInfo = JSON.parse(savedUser); // ✅ Parsear el JSON
+        setCurrentUser(userInfo); // ✅ Establecer el usuario
         setIsLoggedIn(true);
         setIsAdmin(savedAdminStatus === "true");
         console.log("Usuario restaurado desde localStorage:", userInfo);
@@ -69,6 +69,51 @@ function App() {
         localStorage.removeItem("isAdmin");
       }
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchCurrentUserData = async () => {
+      const token =
+        localStorage.getItem("token") || localStorage.getItem("authToken");
+      const savedUser = localStorage.getItem("currentUser");
+
+      if (!token || !savedUser) {
+        console.log("No se encontró token o usuario en localStorage");
+        return;
+      }
+
+      try {
+        const userInfo = JSON.parse(savedUser);
+
+        // Verificar que userInfo tenga un ID válido
+        const userId = userInfo._id || userInfo.id;
+
+        if (!userId) {
+          console.error("No se encontró ID de usuario");
+          return;
+        }
+
+        const res = await fetch(`http://localhost:3001/api/auth/${userId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentUser(data.user);
+          // Actualizar localStorage con los datos más recientes
+          localStorage.setItem("currentUser", JSON.stringify(data.user));
+        } else {
+          console.error("Error al obtener datos del usuario:", res.status);
+        }
+      } catch (error) {
+        console.error("Error al obtener datos del usuario:", error);
+      }
+    };
+
+    fetchCurrentUserData();
   }, []);
 
   // Función para guardar el login en localStorage

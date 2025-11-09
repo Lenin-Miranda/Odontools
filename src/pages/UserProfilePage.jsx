@@ -44,7 +44,8 @@ const UserProfilePage = () => {
           email: userInfo.email || "",
           phone: userInfo.phone || "",
           address: userInfo.address || "",
-          bio: userInfo.bio || "",
+          biography: userInfo.biography || "",
+          image: userInfo.image || "",
         });
       } catch (error) {
         console.error("Error al cargar datos del usuario:", error);
@@ -69,9 +70,7 @@ const UserProfilePage = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${
-            localStorage.getItem("token") || localStorage.getItem("authToken")
-          }`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(formData),
       });
