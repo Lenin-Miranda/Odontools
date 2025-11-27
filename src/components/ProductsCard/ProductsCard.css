@@ -26,7 +26,7 @@
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
   justify-content: center;
   align-items: start;
   grid-gap: 30px;
@@ -34,9 +34,32 @@
   margin: 0;
   padding: 0;
   margin-top: 50px;
-  max-width: 1200px;
+  max-width: 1320px; /* 4 columnas * 300px + 3 gaps * 30px = 1290px + padding */
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Limitar a máximo 4 columnas en pantallas grandes */
+@media (min-width: 1320px) {
+  .products__list {
+    grid-template-columns: repeat(4, 300px);
+  }
+}
+
+/* Responsive: ajusta el minmax según el tamaño de pantalla */
+@media (max-width: 1024px) {
+  .products__list {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 300px));
+    grid-gap: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .products__list {
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+    padding: 0 10px;
+  }
 }
 
 .products__list-item {
@@ -50,19 +73,39 @@
   align-items: flex-start;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
-  max-width: 600px;
+  width: 100%;
+  max-width: 300px;
   height: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+  .products__list-item {
+    max-width: 100%;
+  }
 }
 
 .products__list-image {
   height: 250px; /* Altura fija para uniformidad */
   width: 100%;
+  min-width: 100%; /* Fuerza a ocupar todo el ancho */
   border-radius: 8px 8px 0 0;
-  border: 1px solid #e0e0e0;
-  object-fit: cover;
+  border: none; /* Elimina el borde para que no reduzca el área visible */
+  object-fit: cover; /* Recorta la imagen para llenar el espacio */
   box-sizing: border-box;
-  object-position: center;
+  object-position: center; /* Centra la imagen al recortar */
+  background-color: #ffffff; /* Color de fondo blanco */
+  display: block; /* Elimina espacios inline */
 }
+
+/* Alternativa: Si prefieres que se vea toda la imagen sin recortar */
+/* Descomenta esto y comenta el object-fit: cover de arriba
+.products__list-image {
+  object-fit: contain;
+  background-color: #f9f9f9;
+  padding: 10px;
+}
+*/
 
 .products__list-name {
   margin: 0;
@@ -164,18 +207,24 @@
 
 /* Estilos para cuando hay pocos productos */
 .products__list.few-items {
-  justify-content: flex-start;
+  justify-content: center;
 }
 
-/* Para un solo producto, centrarlo */
+/* Para un solo producto, centrarlo y mantener 300px */
 .products__list.single-item {
   justify-content: center;
-  grid-template-columns: minmax(300px, 400px);
+  grid-template-columns: minmax(300px, 300px);
 }
 
-/* Para 2-3 productos, centrarlos mejor */
+@media (max-width: 480px) {
+  .products__list.single-item {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Para 2-3 productos, centrarlos */
 .products__list.few-items:not(.single-item) {
-  grid-template-columns: repeat(auto-fit, minmax(300px, 350px));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
 }
 
 /* Estilos específicos para productos destacados (4 columnas) */

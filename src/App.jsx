@@ -25,6 +25,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import UserOrdersPage from "./pages/UserOrdersPage";
 import UserFavoritesPage from "./pages/UserFavoritesPage";
 import UserSettingsPage from "./pages/UserSettingsPage";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 
 function App() {
   // Estados principales
@@ -32,7 +33,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null); // Información del usuario logueado
   const [messageType, setMessageType] = useState(""); // "success" o "error"
-  const [cartItems, setCartItems] = useState([]);
   const [isFavorite, setIsfavorite] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -144,7 +144,9 @@ function App() {
     setIsLoggedIn(false);
     setIsAdmin(false);
     setIsUserOpen(false);
+    setIsCartOpen(false); // ✅ Cerrar el modal del carrito
     clearUserFromStorage();
+    // El carrito se limpiará automáticamente por el useEffect en UseCart.jsx
     console.log("Sesión cerrada exitosamente");
   };
 
@@ -259,6 +261,7 @@ function App() {
 
   return (
     <div className="app">
+      <ScrollToTop />
       <NavBar
         toggleCart={toggleCart}
         isLoggedIn={isLoggedIn}
@@ -271,6 +274,7 @@ function App() {
           isCartOpen={isCartOpen}
           cartItems={cart}
           closeCart={closeCart}
+          userInfo={currentUser}
         >
           <ProductsCard products={products} />
         </CartModal>

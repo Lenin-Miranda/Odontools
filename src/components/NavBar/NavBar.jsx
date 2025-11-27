@@ -6,7 +6,7 @@ import { FaBars } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
-import SearchBar from "../Searchbar/SearchBar";
+import SearchBar from "../SearchBar/SearchBar";
 import { useCart } from "../../hooks/UseCart";
 import { CiUser } from "react-icons/ci";
 import { useLocation } from "react-router-dom";
@@ -110,11 +110,14 @@ export default function NavBar({
           <button className="navbar__signup-button" onClick={handleSignUp}>
             Registrate
           </button>
-          <button className="navbar__cart-button" onClick={toggleCart}>
+          <button
+            className="navbar__cart-button"
+            onClick={handleLogin}
+            title="Inicia sesión para ver tu carrito"
+            style={{ opacity: 0.6, cursor: "pointer" }}
+          >
             <FaShoppingCart />
-            <span className="navbar__cart-quantity">
-              {totalQuantity > 99 ? "+99" : totalQuantity}
-            </span>
+            <span className="navbar__cart-quantity">0</span>
           </button>
         </div>
       )}
@@ -128,17 +131,26 @@ export default function NavBar({
         </NavLink>
       </div>
       <div className="navbar__search">
+        {isLoggedIn && (
+          <button
+            className="navbar__user-button"
+            type="button"
+            onClick={handleUserOpen}
+          >
+            <CiUser />
+          </button>
+        )}
         <button
-          className="navbar__user-button"
-          type="button"
-          onClick={handleUserOpen}
+          className="navbar__cart-button"
+          onClick={isLoggedIn ? toggleCart : handleLogin}
+          title={
+            isLoggedIn ? "Ver carrito" : "Inicia sesión para ver tu carrito"
+          }
+          style={!isLoggedIn ? { opacity: 0.6 } : {}}
         >
-          <CiUser />
-        </button>
-        <button className="navbar__cart-button" onClick={toggleCart}>
           <FaShoppingCart />
           <span className="navbar__cart-quantity">
-            {totalQuantity > 99 ? "+99" : totalQuantity}
+            {isLoggedIn ? (totalQuantity > 99 ? "+99" : totalQuantity) : 0}
           </span>
         </button>
 

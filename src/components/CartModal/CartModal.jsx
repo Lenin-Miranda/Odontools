@@ -3,15 +3,43 @@ import { FaTrash } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiPlus } from "react-icons/fi";
 import { FiMinus } from "react-icons/fi";
 import { useCart } from "../../hooks/UseCart";
 import { IoClose } from "react-icons/io5";
+import CheckoutModal from "../CheckoutModal/CheckoutModal";
 
-export default function CartModal({ isCartOpen, cartItems, closeCart }) {
+export default function CartModal({
+  isCartOpen,
+  cartItems,
+  closeCart,
+  userInfo,
+}) {
   const { addToCart, removeFromCart, deleteItem, cartTotal, totalQuantity } =
     useCart();
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  console.log("User Info in CartModal:", userInfo);
+
+  // ✅ useEffect para cerrar con Escape
+  useEffect(() => {
+    const handleEscClose = (e) => {
+      if (e.key === "Escape" && isCartOpen) {
+        closeCart(); // ✅ Invocar la función con ()
+      }
+    };
+
+    // Agregar el listener cuando el modal esté abierto
+    if (isCartOpen) {
+      document.addEventListener("keydown", handleEscClose);
+    }
+
+    // Limpiar el listener al desmontar o cerrar
+    return () => {
+      document.removeEventListener("keydown", handleEscClose);
+    };
+  }, [isCartOpen, closeCart]);
 
   return (
     // 🔹 overlay
@@ -67,39 +95,47 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
           ) : (
             <ul className="cart__modal-container-list">
               {cartItems.map((item) => {
+                // ✅ Ahora item tiene estructura: { product: {...}, quantity: 1 }
+                const product = item.product || item; // Compatibilidad con ambas estructuras
+                const productId = product._id || product.id;
+                const subtotal = (product.price || 0) * (item.quantity || 1);
+
                 return (
                   <li
                     className="cart__modal-container-list-item"
-                    key={`${item.id}-${item.quantity}`}
+                    key={`${productId}-${item.quantity}`}
                   >
                     {/* Imagen */}
                     <div className="cart__modal-container-list-item-l">
                       <img
                         className="cart__modal-container-list-item-l-image"
-                        src={item.image}
-                        alt={item.description}
+                        src={product.image}
+                        alt={product.description}
                       />
                     </div>
 
                     {/* Info derecha */}
                     <div className="cart__modal-container-list-item-r">
                       <h3 className="cart__modal-container-list-item-r-title">
-                        {item.description}
+                        {product.name}
                       </h3>
 
                       <span className="cart__modal-container-list-item-r-categorie">
-                        {item.categorie}
+                        {product.category}
                       </span>
 
                       {/* Precio y eliminar */}
                       <div className="cart__modal-container-list-item-r-container">
                         <p className="cart__modal-container-list-item-r-container-price">
-                          ${item.price.toFixed(2)}
+                          $
+                          {product.discount
+                            ? (product.price * 0.9).toFixed(2)
+                            : product.price}
                         </p>
 
                         <button
                           className="cart__modal-container-list-item-r-container-delete"
-                          onClick={() => deleteItem(item.id)}
+                          onClick={() => deleteItem(productId)}
                         >
                           <FontAwesomeIcon
                             style={{ fontSize: "20px", color: "red" }}
@@ -113,7 +149,7 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
                         <div className="cart__modal-container-list-item-r-container-increment">
                           <button
                             className="cart__modal-container-list-item-r-container-increment-button"
-                            onClick={() => removeFromCart(item.id)}
+                            onClick={() => removeFromCart(productId)}
                           >
                             <FiMinus style={{ fontSize: "25px" }} />
                           </button>
@@ -124,7 +160,7 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
 
                           <button
                             className="cart__modal-container-list-item-r-container-increment-button"
-                            onClick={() => addToCart(item)}
+                            onClick={() => addToCart(product)}
                           >
                             <FiPlus style={{ fontSize: "25px" }} />
                           </button>
@@ -146,7 +182,7 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
                           </span>
 
                           <span style={{ fontSize: "16px", fontWeight: "600" }}>
-                            ${item.subtotal.toFixed(2)}
+                            ${subtotal.toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -204,7 +240,10 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
                 </span>
               </div>
               <div className="cart__modal-container-payment-buttons">
-                <button className="cart__modal-container-payment-button">
+                <button
+                  className="cart__modal-container-payment-button"
+                  onClick={() => setIsCheckoutOpen(true)}
+                >
                   Proceder al pago
                 </button>
                 <button
@@ -229,6 +268,13 @@ export default function CartModal({ isCartOpen, cartItems, closeCart }) {
           </div>
         )}
       </div>
+
+      {/* Modal de Checkout */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        userInfo={userInfo}
+      />
     </div>
   );
 }

@@ -1,20 +1,33 @@
 import search from "../../assets/search.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router";
-
+import { useProducts } from "../../hooks/useProducts";
 import "./SearchBar.css";
 
-export default function SearchBar({ products }) {
+export default function SearchBar() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-
+  const { products, fetchProducts } = useProducts();
   const navigate = useNavigate();
+
+  // ✅ Cargar productos al montar el componente
+  useEffect(() => {
+    if (products.length === 0) {
+      fetchProducts();
+    }
+  }, []);
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setQuery(value);
 
     if (value.trim() === "") {
+      setResults([]);
+      return;
+    }
+
+    // ✅ Validar que products existe y es un array
+    if (!products || !Array.isArray(products)) {
       setResults([]);
       return;
     }
@@ -52,8 +65,8 @@ export default function SearchBar({ products }) {
       >
         {results.map((item) => (
           <div
-            key={item.id}
-            onClick={() => handleSelect(item.id)}
+            key={item._id}
+            onClick={() => handleSelect(item._id)}
             className="searchbar__containter-products"
           >
             <img

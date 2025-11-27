@@ -14,18 +14,28 @@ import {
   FiSearch,
   FiFilter,
 } from "react-icons/fi";
+import { useSales } from "../hooks/useSales";
 import "./UserOrdersPage.css";
 
 const UserOrdersPage = () => {
   const navigate = useNavigate();
+  const {
+    sales,
+    loading,
+    error,
+    getSalesByUser,
+    getSaleById,
+    exportUserSalesToCSV,
+  } = useSales();
+
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   // Cargar usuario y pedidos
   useEffect(() => {
@@ -34,7 +44,7 @@ const UserOrdersPage = () => {
       try {
         const userInfo = JSON.parse(savedUser);
         setUser(userInfo);
-        loadUserOrders(userInfo.id || userInfo._id);
+        loadUserOrders();
       } catch (error) {
         console.error("Error al cargar datos del usuario:", error);
         navigate("/");
@@ -44,68 +54,14 @@ const UserOrdersPage = () => {
     }
   }, [navigate]);
 
-  // Simular carga de pedidos
-  const loadUserOrders = async (userId) => {
-    setLoading(true);
-    try {
-      // Simular datos de pedidos - en producción esto vendría de una API
-      const mockOrders = [
-        {
-          id: "ORD-001",
-          date: "2024-10-15T10:30:00Z",
-          status: "delivered",
-          total: 89.99,
-          items: [
-            { name: "Espejo Dental Premium", quantity: 2, price: 34.99 },
-            { name: "Pinzas Quirúrgicas", quantity: 1, price: 20.01 },
-          ],
-          shipping: {
-            address: "Calle Principal 123, Ciudad",
-            method: "Express",
-            trackingNumber: "TRK123456789",
-          },
-        },
-        {
-          id: "ORD-002",
-          date: "2024-10-20T14:15:00Z",
-          status: "pending",
-          total: 156.5,
-          items: [
-            { name: "Kit Exploración Dental", quantity: 1, price: 125.0 },
-            { name: "Guantes Látex (100 unidades)", quantity: 1, price: 31.5 },
-          ],
-          shipping: {
-            address: "Calle Principal 123, Ciudad",
-            method: "Standard",
-            trackingNumber: "TRK987654321",
-          },
-        },
-        {
-          id: "ORD-003",
-          date: "2024-10-25T09:45:00Z",
-          status: "shipping",
-          total: 245.75,
-          items: [
-            { name: "Lámpara LED Dental", quantity: 1, price: 199.99 },
-            { name: "Desinfectante Profesional", quantity: 2, price: 22.88 },
-          ],
-          shipping: {
-            address: "Calle Principal 123, Ciudad",
-            method: "Express",
-            trackingNumber: "TRK456789123",
-          },
-        },
-      ];
-
-      // Simular delay de API
-      setTimeout(() => {
-        setOrders(mockOrders);
-        setFilteredOrders(mockOrders);
-        setLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error("Error al cargar pedidos:", error);
-      setLoading(false);
+  // Cargar pedidos del usuario desde la API
+  const loadUserOrders = async () => {
+    const result = await getSalesByUser();
+    if (result.success) {
+      setOrders(result.data || []);
+      setFilteredOrders(result.data || []);
+    } else {
+      console.error("Error al cargar pedidos:", result.error);
     }
   };
 
@@ -117,9 +73,9 @@ const UserOrdersPage = () => {
     if (searchTerm) {
       filtered = filtered.filter(
         (order) =>
-          order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          order.items.some((item) =>
-            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+          order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          order.products.some((item) =>
+            item.product?.name.toLowerCase().includes(searchTerm.toLowerCase())
           )
       );
     }
@@ -165,10 +121,17 @@ const UserOrdersPage = () => {
           color: "#8b5cf6",
           bgColor: "#e9d5ff",
         };
-      case "delivered":
+      case "shipped":
+        return {
+          icon: <FiTruck />,
+          text: "Enviado",
+          color: "#8b5cf6",
+          bgColor: "#e9d5ff",
+        };
+      case "completed":
         return {
           icon: <FiCheckCircle />,
-          text: "Entregado",
+          text: "Completado",
           color: "#10b981",
           bgColor: "#d1fae5",
         };
@@ -178,6 +141,13 @@ const UserOrdersPage = () => {
           text: "Cancelado",
           color: "#ef4444",
           bgColor: "#fee2e2",
+        };
+      case "paid":
+        return {
+          icon: <FiDollarSign />,
+          text: "Pagado",
+          color: "#059669",
+          bgColor: "#d1fae5",
         };
       default:
         return {
@@ -191,12 +161,12 @@ const UserOrdersPage = () => {
 
   const calculateOrderStats = () => {
     const totalOrders = orders.length;
-    const totalSpent = orders.reduce((sum, order) => sum + order.total, 0);
+    const totalSpent = orders.reduce((sum, order) => sum + order.totalPrice, 0);
     const deliveredOrders = orders.filter(
-      (order) => order.status === "delivered"
+      (order) => order.status === "completed"
     ).length;
     const pendingOrders = orders.filter((order) =>
-      ["pending", "processing", "shipping"].includes(order.status)
+      ["pending", "processing", "shipped"].includes(order.status)
     ).length;
 
     return { totalOrders, totalSpent, deliveredOrders, pendingOrders };
@@ -204,9 +174,25 @@ const UserOrdersPage = () => {
 
   const stats = calculateOrderStats();
 
-  const viewOrderDetails = (order) => {
-    setSelectedOrder(order);
+  // Ver detalles del pedido
+  const viewOrderDetails = async (order) => {
+    setLoadingDetail(true);
+    const result = await getSaleById(order._id);
+    if (result.success) {
+      setSelectedOrder(result.data);
+    } else {
+      setSelectedOrder(order); // Fallback a los datos que ya tenemos
+    }
     setShowOrderModal(true);
+    setLoadingDetail(false);
+  };
+
+  // Exportar pedidos del usuario
+  const handleExportOrders = async () => {
+    const result = await exportUserSalesToCSV();
+    if (!result.success) {
+      alert("Error al exportar: " + result.error);
+    }
   };
 
   if (!user) {
@@ -234,6 +220,14 @@ const UserOrdersPage = () => {
               Revisa el estado y historial de todos tus pedidos
             </p>
           </div>
+          <button
+            className="export-orders-btn"
+            onClick={handleExportOrders}
+            disabled={loading || orders.length === 0}
+          >
+            <FiDownload />
+            Exportar Pedidos
+          </button>
         </div>
 
         {/* Statistics */}
@@ -290,9 +284,10 @@ const UserOrdersPage = () => {
             >
               <option value="all">Todos los estados</option>
               <option value="pending">Pendiente</option>
+              <option value="paid">Pagado</option>
               <option value="processing">Procesando</option>
-              <option value="shipping">Enviado</option>
-              <option value="delivered">Entregado</option>
+              <option value="shipped">Enviado</option>
+              <option value="completed">Completado</option>
               <option value="cancelled">Cancelado</option>
             </select>
           </div>
@@ -320,13 +315,15 @@ const UserOrdersPage = () => {
               {filteredOrders.map((order) => {
                 const statusInfo = getStatusInfo(order.status);
                 return (
-                  <div key={order.id} className="order-card">
+                  <div key={order._id} className="order-card">
                     <div className="order-header">
                       <div className="order-info">
-                        <h3 className="order-id">Pedido {order.id}</h3>
+                        <h3 className="order-id">
+                          Pedido #{order._id.slice(-8).toUpperCase()}
+                        </h3>
                         <p className="order-date">
                           <FiCalendar />
-                          {formatDate(order.date)}
+                          {formatDate(order.saleDate)}
                         </p>
                       </div>
                       <div className="order-status">
@@ -345,19 +342,21 @@ const UserOrdersPage = () => {
 
                     <div className="order-body">
                       <div className="order-items">
-                        <h4>Productos ({order.items.length})</h4>
+                        <h4>Productos ({order.products.length})</h4>
                         <div className="items-list">
-                          {order.items.slice(0, 2).map((item, index) => (
+                          {order.products.slice(0, 2).map((item, index) => (
                             <div key={index} className="item-summary">
-                              <span className="item-name">{item.name}</span>
+                              <span className="item-name">
+                                {item.product?.name || "Producto eliminado"}
+                              </span>
                               <span className="item-quantity">
                                 x{item.quantity}
                               </span>
                             </div>
                           ))}
-                          {order.items.length > 2 && (
+                          {order.products.length > 2 && (
                             <div className="item-summary more">
-                              <span>+{order.items.length - 2} más</span>
+                              <span>+{order.products.length - 2} más</span>
                             </div>
                           )}
                         </div>
@@ -367,15 +366,16 @@ const UserOrdersPage = () => {
                         <div className="order-total">
                           <FiDollarSign />
                           <span className="total-amount">
-                            ${order.total.toFixed(2)}
+                            ${order.totalPrice.toFixed(2)}
                           </span>
                         </div>
                         <button
                           className="view-order-btn"
                           onClick={() => viewOrderDetails(order)}
+                          disabled={loadingDetail}
                         >
                           <FiEye />
-                          Ver Detalles
+                          {loadingDetail ? "Cargando..." : "Ver Detalles"}
                         </button>
                       </div>
                     </div>
@@ -394,7 +394,10 @@ const UserOrdersPage = () => {
           >
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h3>Detalles del Pedido {selectedOrder.id}</h3>
+                <h3>
+                  Detalles del Pedido #
+                  {selectedOrder._id.slice(-8).toUpperCase()}
+                </h3>
                 <button
                   className="modal-close"
                   onClick={() => setShowOrderModal(false)}
@@ -408,7 +411,8 @@ const UserOrdersPage = () => {
                   <h4>Información del Pedido</h4>
                   <div className="detail-grid">
                     <div>
-                      <strong>Fecha:</strong> {formatDate(selectedOrder.date)}
+                      <strong>Fecha:</strong>{" "}
+                      {formatDate(selectedOrder.saleDate)}
                     </div>
                     <div>
                       <strong>Estado:</strong>
@@ -426,12 +430,16 @@ const UserOrdersPage = () => {
                       </span>
                     </div>
                     <div>
-                      <strong>Número de seguimiento:</strong>{" "}
-                      {selectedOrder.shipping.trackingNumber}
+                      <strong>Método de pago:</strong>{" "}
+                      {selectedOrder.paymentMethod === "cash"
+                        ? "💵 Efectivo"
+                        : selectedOrder.paymentMethod === "card"
+                        ? "💳 Tarjeta"
+                        : "🏦 Transferencia"}
                     </div>
                     <div>
-                      <strong>Método de envío:</strong>{" "}
-                      {selectedOrder.shipping.method}
+                      <strong>Teléfono:</strong>{" "}
+                      {selectedOrder.customerPhone || "No proporcionado"}
                     </div>
                   </div>
                 </div>
@@ -439,24 +447,28 @@ const UserOrdersPage = () => {
                 <div className="order-detail-section">
                   <h4>Productos</h4>
                   <div className="detailed-items">
-                    {selectedOrder.items.map((item, index) => (
+                    {selectedOrder.products.map((item, index) => (
                       <div key={index} className="detailed-item">
-                        <span className="item-name">{item.name}</span>
+                        <span className="item-name">
+                          {item.product?.name || "Producto eliminado"}
+                        </span>
                         <span className="item-quantity">x{item.quantity}</span>
                         <span className="item-price">
-                          ${item.price.toFixed(2)}
+                          ${item.priceAtSale.toFixed(2)}
                         </span>
                       </div>
                     ))}
                   </div>
                   <div className="order-total-detail">
-                    <strong>Total: ${selectedOrder.total.toFixed(2)}</strong>
+                    <strong>
+                      Total: ${selectedOrder.totalPrice.toFixed(2)}
+                    </strong>
                   </div>
                 </div>
 
                 <div className="order-detail-section">
                   <h4>Dirección de Envío</h4>
-                  <p>{selectedOrder.shipping.address}</p>
+                  <p>{selectedOrder.shippingAddress}</p>
                 </div>
               </div>
 

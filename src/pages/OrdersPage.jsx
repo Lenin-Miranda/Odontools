@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FiShoppingCart,
   FiSearch,
@@ -10,22 +10,44 @@ import {
   FiCalendar,
   FiUser,
   FiDollarSign,
+  FiPackage,
 } from "react-icons/fi";
-import { ordersData } from "../data/ordersData";
+import { useSales } from "../hooks/useSales";
 import "./OrdersPage.css";
 
 export default function OrdersPage() {
+  const {
+    sales,
+    loading,
+    error,
+    fetchSales,
+    updateSaleStatus,
+    confirmSale,
+    exportSalesToCSV,
+  } = useSales();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditingStatus, setIsEditingStatus] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+
+  // Cargar ventas al montar el componente
+  useEffect(() => {
+    fetchSales();
+  }, []);
 
   // Filtrar pedidos
-  const filteredOrders = ordersData.filter((order) => {
+  const filteredOrders = sales.filter((order) => {
+    const customerName = order.user?.name || "N/A";
+    const customerEmail = order.user?.email || "N/A";
+    const orderId = order._id?.slice(-8).toUpperCase() || "";
+
     const matchesSearch =
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase());
+      customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      orderId.includes(searchTerm.toUpperCase());
 
     const matchesStatus =
       statusFilter === "all" || order.status === statusFilter;
@@ -37,21 +59,50 @@ export default function OrdersPage() {
   const handleViewOrder = (order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
+    setIsEditingStatus(false);
   };
 
-  const handleEditOrder = (orderId) => {
-    console.log("Edit order:", orderId);
-    // Aquí irá la lógica de edición
+  const handleEditStatus = async () => {
+    if (!newStatus || !selectedOrder) return;
+
+    const result = await updateSaleStatus(selectedOrder._id, newStatus);
+
+    if (result.success) {
+      setSelectedOrder({ ...selectedOrder, status: newStatus });
+      setIsEditingStatus(false);
+      fetchSales(); // Recargar ventas
+    } else {
+      alert("Error al actualizar el estado: " + result.error);
+    }
   };
 
-  const handleDeleteOrder = (orderId) => {
-    console.log("Delete order:", orderId);
-    // Aquí irá la lógica de eliminación
+  const handleConfirmSale = async () => {
+    if (!selectedOrder) return;
+
+    const confirmed = window.confirm(
+      `¿Confirmar el pago del pedido #${selectedOrder._id
+        .slice(-8)
+        .toUpperCase()}?\n\nEsto descontará el stock de los productos.`
+    );
+
+    if (!confirmed) return;
+
+    const result = await confirmSale(selectedOrder._id);
+
+    if (result.success) {
+      setSelectedOrder({ ...selectedOrder, status: "paid" });
+      alert("✅ Pago confirmado y stock descontado exitosamente");
+      fetchSales(); // Recargar ventas
+    } else {
+      alert("❌ Error al confirmar el pago: " + result.error);
+    }
   };
 
-  const handleExportOrders = () => {
-    console.log("Export orders");
-    // Aquí irá la lógica de exportación
+  const handleExportOrders = async () => {
+    const result = await exportSalesToCSV();
+    if (!result.success) {
+      alert("Error al exportar: " + result.error);
+    }
   };
 
   // Función para obtener el color del estado
@@ -81,6 +132,8 @@ export default function OrdersPage() {
         return "Pendiente";
       case "shipped":
         return "Enviado";
+      case "paid":
+        return "Pagado";
       case "processing":
         return "Procesando";
       case "cancelled":
@@ -89,6 +142,38 @@ export default function OrdersPage() {
         return status;
     }
   };
+
+  // Calcular estadísticas
+  const totalRevenue = sales.reduce(
+    (sum, order) => sum + (order.totalPrice || 0),
+    0
+  );
+  const completedOrders = sales.filter((o) => o.status === "completed").length;
+  const pendingOrders = sales.filter((o) => o.status === "pending").length;
+
+  if (loading && sales.length === 0) {
+    return (
+      <div className="orders-page">
+        <div className="orders-page__loading">
+          <FiPackage className="orders-page__loading-icon" />
+          <p>Cargando pedidos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && sales.length === 0) {
+    return (
+      <div className="orders-page">
+        <div className="orders-page__error">
+          <p>❌ Error al cargar pedidos: {error}</p>
+          <button onClick={fetchSales} className="orders-page__retry-btn">
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="orders-page">
@@ -119,7 +204,7 @@ export default function OrdersPage() {
             <FiShoppingCart />
           </div>
           <div className="orders-page__stat-info">
-            <h3>{ordersData.length}</h3>
+            <h3>{sales.length}</h3>
             <p>Total Pedidos</p>
           </div>
         </div>
@@ -129,7 +214,7 @@ export default function OrdersPage() {
             <FiDollarSign />
           </div>
           <div className="orders-page__stat-info">
-            <h3>{ordersData.filter((o) => o.status === "completed").length}</h3>
+            <h3>{completedOrders}</h3>
             <p>Completados</p>
           </div>
         </div>
@@ -139,7 +224,7 @@ export default function OrdersPage() {
             <FiCalendar />
           </div>
           <div className="orders-page__stat-info">
-            <h3>{ordersData.filter((o) => o.status === "pending").length}</h3>
+            <h3>{pendingOrders}</h3>
             <p>Pendientes</p>
           </div>
         </div>
@@ -149,12 +234,7 @@ export default function OrdersPage() {
             <FiDollarSign />
           </div>
           <div className="orders-page__stat-info">
-            <h3>
-              $
-              {ordersData
-                .reduce((sum, order) => sum + order.total, 0)
-                .toFixed(2)}
-            </h3>
+            <h3>${totalRevenue.toFixed(2)}</h3>
             <p>Ingresos Totales</p>
           </div>
         </div>
@@ -212,25 +292,25 @@ export default function OrdersPage() {
               </tr>
             ) : (
               filteredOrders.map((order) => (
-                <tr key={order.id} className="orders-page__table-row">
+                <tr key={order._id} className="orders-page__table-row">
                   <td className="orders-page__table-cell">
                     <span className="orders-page__order-number">
-                      {order.orderNumber}
+                      #{order._id.slice(-8).toUpperCase()}
                     </span>
                   </td>
                   <td className="orders-page__table-cell">
                     <div className="orders-page__customer-info">
                       <span className="orders-page__customer-name">
-                        {order.customerName}
+                        {order.user?.name || "N/A"}
                       </span>
                       <span className="orders-page__customer-email">
-                        {order.customerEmail}
+                        {order.user?.email || "N/A"}
                       </span>
                     </div>
                   </td>
                   <td className="orders-page__table-cell">
                     <span className="orders-page__date">
-                      {new Date(order.date).toLocaleDateString("es-ES")}
+                      {new Date(order.saleDate).toLocaleDateString("es-ES")}
                     </span>
                   </td>
                   <td className="orders-page__table-cell">
@@ -244,7 +324,7 @@ export default function OrdersPage() {
                   </td>
                   <td className="orders-page__table-cell">
                     <span className="orders-page__total">
-                      ${order.total.toFixed(2)}
+                      ${order.totalPrice.toFixed(2)}
                     </span>
                   </td>
                   <td className="orders-page__table-cell">
@@ -258,17 +338,15 @@ export default function OrdersPage() {
                       </button>
                       <button
                         className="orders-page__action-btn orders-page__action-btn--edit"
-                        onClick={() => handleEditOrder(order.id)}
-                        title="Editar pedido"
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setNewStatus(order.status);
+                          setIsEditingStatus(true);
+                          setIsModalOpen(true);
+                        }}
+                        title="Cambiar estado"
                       >
                         <FiEdit />
-                      </button>
-                      <button
-                        className="orders-page__action-btn orders-page__action-btn--delete"
-                        onClick={() => handleDeleteOrder(order.id)}
-                        title="Eliminar pedido"
-                      >
-                        <FiTrash2 />
                       </button>
                     </div>
                   </td>
@@ -290,7 +368,7 @@ export default function OrdersPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="orders-page__modal-header">
-              <h2>Detalles del Pedido {selectedOrder.orderNumber}</h2>
+              <h2>Pedido #{selectedOrder._id.slice(-8).toUpperCase()}</h2>
               <button
                 className="orders-page__modal-close"
                 onClick={() => setIsModalOpen(false)}
@@ -300,59 +378,165 @@ export default function OrdersPage() {
             </div>
 
             <div className="orders-page__modal-body">
+              {/* Información del Cliente */}
               <div className="orders-page__modal-section">
-                <h3>Información del Cliente</h3>
+                <h3>👤 Información del Cliente</h3>
                 <p>
-                  <strong>Nombre:</strong> {selectedOrder.customerName}
+                  <strong>Nombre:</strong> {selectedOrder.user?.name || "N/A"}
                 </p>
                 <p>
-                  <strong>Email:</strong> {selectedOrder.customerEmail}
+                  <strong>Email:</strong> {selectedOrder.user?.email || "N/A"}
                 </p>
                 <p>
-                  <strong>Dirección:</strong>{" "}
-                  {selectedOrder.shippingAddress.street},{" "}
-                  {selectedOrder.shippingAddress.city},{" "}
-                  {selectedOrder.shippingAddress.country}
+                  <strong>Teléfono:</strong>{" "}
+                  {selectedOrder.customerPhone || "No proporcionado"}
                 </p>
+                <p>
+                  <strong>Dirección:</strong> {selectedOrder.shippingAddress}
+                </p>
+                {selectedOrder.bankAccountName && (
+                  <>
+                    <p style={{ marginTop: "10px", fontWeight: "600" }}>
+                      🏦 Datos Bancarios del Cliente:
+                    </p>
+                    <p>
+                      <strong>Titular:</strong> {selectedOrder.bankAccountName}
+                    </p>
+                    <p>
+                      <strong>Cuenta:</strong> {selectedOrder.bankAccountNumber}
+                    </p>
+                  </>
+                )}
               </div>
 
+              {/* Productos */}
               <div className="orders-page__modal-section">
-                <h3>Productos</h3>
+                <h3>🛍️ Productos</h3>
                 <div className="orders-page__modal-items">
-                  {selectedOrder.items.map((item, index) => (
+                  {selectedOrder.products.map((item, index) => (
                     <div key={index} className="orders-page__modal-item">
-                      <span className="orders-page__modal-item-name">
-                        {item.name}
-                      </span>
-                      <span className="orders-page__modal-item-quantity">
-                        Cantidad: {item.quantity}
-                      </span>
-                      <span className="orders-page__modal-item-price">
-                        ${item.price.toFixed(2)}
-                      </span>
+                      <div className="orders-page__modal-item-info">
+                        <span className="orders-page__modal-item-name">
+                          {item.product?.name || "Producto eliminado"}
+                        </span>
+                        <span className="orders-page__modal-item-quantity">
+                          Cantidad: {item.quantity}
+                        </span>
+                      </div>
+                      <div className="orders-page__modal-item-prices">
+                        <span className="orders-page__modal-item-unit-price">
+                          ${item.priceAtSale.toFixed(2)} c/u
+                        </span>
+                        <span className="orders-page__modal-item-price">
+                          ${item.subtotal.toFixed(2)}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
 
+              {/* Estado del Pedido */}
               <div className="orders-page__modal-section">
-                <h3>Resumen</h3>
+                <h3>📦 Estado del Pedido</h3>
+
+                {/* Botón de confirmar pago para pedidos pending */}
+                {selectedOrder.status === "pending" && !isEditingStatus && (
+                  <div className="orders-page__confirm-payment">
+                    <button
+                      onClick={handleConfirmSale}
+                      className="orders-page__modal-btn orders-page__modal-btn--confirm"
+                      disabled={loading}
+                    >
+                      ✅{" "}
+                      {loading
+                        ? "Confirmando..."
+                        : "Confirmar Pago y Descontar Stock"}
+                    </button>
+                    <p className="orders-page__confirm-hint">
+                      Al confirmar, el estado cambiará a "Pagado" y se
+                      descontará el stock automáticamente
+                    </p>
+                  </div>
+                )}
+
+                {isEditingStatus ? (
+                  <div className="orders-page__modal-status-edit">
+                    <select
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value)}
+                      className="orders-page__status-select"
+                    >
+                      <option value="pending">Pendiente</option>
+                      <option value="paid">Pagado</option>
+                      <option value="shipped">Enviado</option>
+                      <option value="completed">Completado</option>
+                      <option value="cancelled">Cancelado</option>
+                    </select>
+                    <div className="orders-page__modal-status-buttons">
+                      <button
+                        onClick={handleEditStatus}
+                        className="orders-page__modal-btn orders-page__modal-btn--save"
+                        disabled={loading}
+                      >
+                        {loading ? "Guardando..." : "Guardar"}
+                      </button>
+                      <button
+                        onClick={() => setIsEditingStatus(false)}
+                        className="orders-page__modal-btn orders-page__modal-btn--cancel"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="orders-page__modal-status-display">
+                    <span
+                      className={`orders-page__status ${getStatusColor(
+                        selectedOrder.status
+                      )}`}
+                    >
+                      {translateStatus(selectedOrder.status)}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setIsEditingStatus(true);
+                        setNewStatus(selectedOrder.status);
+                      }}
+                      className="orders-page__modal-btn orders-page__modal-btn--edit"
+                    >
+                      <FiEdit /> Cambiar Estado
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Resumen */}
+              <div className="orders-page__modal-section">
+                <h3>💰 Resumen</h3>
                 <p>
                   <strong>Fecha:</strong>{" "}
-                  {new Date(selectedOrder.date).toLocaleDateString("es-ES")}
+                  {new Date(selectedOrder.saleDate).toLocaleDateString(
+                    "es-ES",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}
                 </p>
                 <p>
-                  <strong>Estado:</strong>{" "}
-                  <span
-                    className={`orders-page__status ${getStatusColor(
-                      selectedOrder.status
-                    )}`}
-                  >
-                    {translateStatus(selectedOrder.status)}
-                  </span>
+                  <strong>Método de Pago:</strong>{" "}
+                  {selectedOrder.paymentMethod === "cash"
+                    ? "💵 Efectivo"
+                    : selectedOrder.paymentMethod === "card"
+                    ? "💳 Tarjeta"
+                    : "🏦 Transferencia"}
                 </p>
-                <p>
-                  <strong>Total:</strong> ${selectedOrder.total.toFixed(2)}
+                <p className="orders-page__modal-total">
+                  <strong>Total:</strong> ${selectedOrder.totalPrice.toFixed(2)}
                 </p>
               </div>
             </div>
