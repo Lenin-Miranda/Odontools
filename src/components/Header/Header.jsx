@@ -8,7 +8,7 @@ export default function Header({ children }) {
     <>
       {children}
       <header className="header" id="home">
-        <div className="header__hero">
+        <div className="header__hero" data-aos="fade-right">
           <h1 className="header__hero-title">
             Equipos y suministros Dentales Profesionales
           </h1>
@@ -35,8 +35,16 @@ export default function Header({ children }) {
             </NavLink>
           </div>
         </div>
-        <div className="header__image-container">
-          <img className="header__image" src={prueba} />
+        <div
+          className="header__image-container"
+          data-aos="fade-left"
+          data-aos-delay="200"
+        >
+          <img
+            className="header__image"
+            src={prueba}
+            alt="Equipos dentales profesionales"
+          />
         </div>
       </header>
     </>

@@ -3,6 +3,7 @@ import { useProducts } from "../../hooks/useProducts";
 import ProductsCard from "../ProductsCard/ProductsCard";
 import "./Products.css";
 import { useEffect, useState } from "react";
+import AOS from "aos";
 
 export default function Products({ isFavorite, toggleFavorite }) {
   const {
@@ -16,6 +17,8 @@ export default function Products({ isFavorite, toggleFavorite }) {
     const loadProducts = async () => {
       // Solo usar datos de la API, ignorar props hardcoded
       await fetchProducts();
+      // Refrescar AOS después de cargar productos
+      AOS.refresh();
     };
 
     loadProducts();
@@ -38,7 +41,7 @@ export default function Products({ isFavorite, toggleFavorite }) {
     .slice(0, 8); // Limitar a 8 productos destacados
   return (
     <section className="products" id="products">
-      <div className="products__header">
+      <div className="products__header" data-aos="fade-up">
         <h2 className="products__title">Productos Destacados</h2>
         <p className="products__description">
           Descubre nuestros equipos y suministros dentales más populares y mejor

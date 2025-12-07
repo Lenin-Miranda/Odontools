@@ -1,17 +1,26 @@
-// Utilidades de autenticación
+// Utilidades de autenticación con Cookies
 
-export const handleAuthError = (response) => {
+const API_URL = "http://localhost:3001/api";
+
+export const handleAuthError = async (response) => {
   if (response.status === 401) {
     // Token expirado o inválido
     console.warn("⚠️ Sesión expirada. Redirigiendo al login...");
 
-    // Limpiar todo el localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("authToken");
+    // Llamar al endpoint de logout para limpiar la cookie
+    try {
+      await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include", // Importante para enviar cookies
+      });
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+
+    // Limpiar datos de usuario del localStorage
     localStorage.removeItem("currentUser");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("access_token");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("isAdmin");
 
     // Mostrar alerta al usuario
     alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
@@ -24,21 +33,19 @@ export const handleAuthError = (response) => {
   return false;
 };
 
-export const getAuthToken = () => {
-  return (
-    localStorage.getItem("token") ||
-    localStorage.getItem("authToken") ||
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("jwt") ||
-    localStorage.getItem("access_token")
-  );
-};
+export const clearAuthData = async () => {
+  // Llamar al endpoint de logout para limpiar la cookie
+  try {
+    await fetch(`${API_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+  }
 
-export const clearAuthData = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("authToken");
+  // Limpiar datos del localStorage
   localStorage.removeItem("currentUser");
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("jwt");
-  localStorage.removeItem("access_token");
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("isAdmin");
 };

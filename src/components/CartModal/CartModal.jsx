@@ -94,8 +94,8 @@ export default function CartModal({
             </div>
           ) : (
             <ul className="cart__modal-container-list">
-              {cartItems.map((item) => {
-                // ✅ Ahora item tiene estructura: { product: {...}, quantity: 1 }
+              {cartItems.map((item, index) => {
+                // ✅ Ahora item tiene estructura: { _id: cartItemId, product: {...}, quantity: 1 }
                 const product = item.product || item; // Compatibilidad con ambas estructuras
                 const productId = product._id || product.id;
                 const subtotal = (product.price || 0) * (item.quantity || 1);
@@ -103,7 +103,7 @@ export default function CartModal({
                 return (
                   <li
                     className="cart__modal-container-list-item"
-                    key={`${productId}-${item.quantity}`}
+                    key={item._id || `${productId}-${index}`}
                   >
                     {/* Imagen */}
                     <div className="cart__modal-container-list-item-l">

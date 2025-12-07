@@ -241,7 +241,9 @@ const UsersPage = () => {
           <tbody>
             {filteredUsers.map((user) => (
               <tr key={user._id} className="users-table__row">
-                <td className="users-table__id">#{user._id}</td>
+                <td className="users-table__id" title={user._id}>
+                  #{user._id}
+                </td>
                 <td className="users-table__user">
                   <div className="user-info">
                     <div className="user-info__avatar">
@@ -250,7 +252,7 @@ const UsersPage = () => {
                     <div className="user-info__details">
                       <div className="user-info__name">{user.name}</div>
                       <div className="user-info__role">
-                        {user.role || "Cliente"}
+                        {user.isAdmin ? "Administrador" : "Cliente"}
                       </div>
                     </div>
                   </div>
@@ -312,6 +314,100 @@ const UsersPage = () => {
         )}
       </div>
 
+      {/* Vista de cartas para móvil */}
+      <div className="users-page__cards-container">
+        {filteredUsers.map((user) => (
+          <div key={user._id} className="user-card">
+            <div className="user-card__header">
+              <div className="user-card__avatar">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="user-card__header-info">
+                <h3 className="user-card__name">{user.name}</h3>
+                <span className="user-card__role">
+                  {user.isAdmin ? "Administrador" : "Cliente"}
+                </span>
+              </div>
+              <span
+                className="user-card__status"
+                style={{ backgroundColor: getStatusColor(user.status) }}
+              >
+                {getStatusText(user.status)}
+              </span>
+            </div>
+
+            <div className="user-card__body">
+              <div className="user-card__info-item">
+                <span className="user-card__label">ID:</span>
+                <span className="user-card__value" title={user._id}>
+                  #{user._id}
+                </span>
+              </div>
+              <div className="user-card__info-item">
+                <span className="user-card__label">
+                  <FiMail className="user-card__icon" />
+                  Email:
+                </span>
+                <span className="user-card__value">{user.email}</span>
+              </div>
+              <div className="user-card__info-item">
+                <span className="user-card__label">
+                  <FiCalendar className="user-card__icon" />
+                  Registro:
+                </span>
+                <span className="user-card__value">
+                  {formatDate(user.registrationDate)}
+                </span>
+              </div>
+              <div className="user-card__info-item">
+                <span className="user-card__label">
+                  <FiShoppingBag className="user-card__icon" />
+                  Pedidos:
+                </span>
+                <span className="user-card__value">
+                  {user.orders?.length || 0}
+                </span>
+              </div>
+              <div className="user-card__info-item">
+                <span className="user-card__label">Total Gastado:</span>
+                <span className="user-card__value user-card__value--amount">
+                  ${calculateTotalSpent(user.orders || [])}
+                </span>
+              </div>
+            </div>
+
+            <div className="user-card__actions">
+              <button
+                className="user-card__btn user-card__btn--view"
+                onClick={() => handleViewUser(user)}
+              >
+                <FiEye /> Ver
+              </button>
+              <button
+                className="user-card__btn user-card__btn--edit"
+                onClick={() => handleEditUser(user)}
+              >
+                <FiEdit3 /> Editar
+              </button>
+              <button
+                className="user-card__btn user-card__btn--delete"
+                onClick={() => handleDeleteUser(user)}
+              >
+                <FiTrash2 /> Eliminar
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {filteredUsers.length === 0 && (
+          <div className="users-page__empty">
+            <FiUser className="users-page__empty-icon" />
+            <h3>No se encontraron usuarios</h3>
+            <p>No hay usuarios que coincidan con los criterios de búsqueda.</p>
+          </div>
+        )}
+      </div>
+
       {/* Modal de detalles de usuario */}
       {showUserModal && selectedUser && (
         <div className="user-modal-overlay" onClick={closeUserModal}>
@@ -351,7 +447,9 @@ const UsersPage = () => {
                   </div>
                   <div className="user-modal__info-item">
                     <label>Rol:</label>
-                    <span>{selectedUser.role || "Cliente"}</span>
+                    <span>
+                      {selectedUser.isAdmin ? "Administrador" : "Cliente"}
+                    </span>
                   </div>
                   <div className="user-modal__info-item">
                     <label>Estado:</label>
@@ -424,10 +522,12 @@ const UsersPage = () => {
       {/* Modal de edición de usuario */}
       {showEditModal && editingUser && (
         <UserEditModal
+          isOpen={showEditModal}
           user={editingUser}
           mode={modalMode}
-          onSave={handleUpdateUser}
+          onSubmit={handleUpdateUser}
           onClose={closeEditModal}
+          isLoading={loading}
         />
       )}
     </div>

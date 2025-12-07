@@ -3,7 +3,7 @@ import perfil from "../../assets/perfil_01.jpg";
 export default function About() {
   return (
     <section className="about" id="about">
-      <div className="about__container">
+      <div className="about__container" data-aos="fade-up">
         <h2 className="about__title">Acerca de Odontools</h2>
         <p className="about__subtitle">
           Con más de 25 años de experiencia en la industria dental, TiendaDental
@@ -12,19 +12,35 @@ export default function About() {
           instrumentos y materiales de alta calidad a precios competitivos.
         </p>
         <ul className="about__list">
-          <li className="about__list-item">
+          <li
+            className="about__list-item"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
             <span className="about__list-item-text">10,000+ </span>
             <span style={{ fontSize: "18px" }}>Productos</span>
           </li>
-          <li className="about__list-item">
+          <li
+            className="about__list-item"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
             <span className="about__list-item-text">5,000+ </span>
             <span style={{ fontSize: "18px" }}>Clientes Satisfechos</span>
           </li>
-          <li className="about__list-item">
+          <li
+            className="about__list-item"
+            data-aos="fade-up"
+            data-aos-delay="300"
+          >
             <span className="about__list-item-text">25+</span>
             <span style={{ fontSize: "18px" }}>Años de Experiencia</span>
           </li>
-          <li className="about__list-item">
+          <li
+            className="about__list-item"
+            data-aos="fade-up"
+            data-aos-delay="400"
+          >
             <span className="about__list-item-text">50+</span>
             <span style={{ fontSize: "18px" }}>Paises atendidos</span>
           </li>
@@ -33,7 +49,7 @@ export default function About() {
           Conoce mas sobre nosotros
         </button>
       </div>
-      <div className="about__container">
+      <div className="about__container" data-aos="fade-up" data-aos-delay="200">
         <img className="about__container-image" src={perfil} />
       </div>
     </section>

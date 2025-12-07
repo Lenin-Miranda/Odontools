@@ -5,32 +5,14 @@ export const useUsers = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Obtener token de localStorage
-  const getToken = () => {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("authToken") ||
-      localStorage.getItem("accessToken") ||
-      localStorage.getItem("jwt") ||
-      localStorage.getItem("access_token")
-    );
-  };
-
   // Obtener todos los usuarios
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const token = getToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch("http://localhost:3001/api/auth", {
-        headers,
+        credentials: "include", // Envía cookies automáticamente
       });
 
       if (!response.ok) {
@@ -64,15 +46,8 @@ export const useUsers = () => {
         throw new Error("ID de usuario inválido para consulta");
       }
 
-      const token = getToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(`http://localhost:3001/api/auth/${id}`, {
-        headers,
+        credentials: "include", // Envía cookies automáticamente
       });
 
       if (!response.ok) {
@@ -100,18 +75,12 @@ export const useUsers = () => {
         throw new Error("ID de usuario inválido para actualización");
       }
 
-      const token = getToken();
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(`http://localhost:3001/api/auth/${id}`, {
         method: "PUT",
-        headers,
+        credentials: "include", // Envía cookies automáticamente
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(userData),
       });
 
@@ -124,9 +93,19 @@ export const useUsers = () => {
 
       // Actualizar lista local de usuarios
       setUsers((prev) =>
-        prev.map((user) =>
-          user._id === id || user.id === id ? result.user || result : user
-        )
+        prev.map((user) => {
+          if (user._id === id || user.id === id) {
+            // Combinar los datos actualizados con los datos existentes
+            const updatedUser = result.user || result;
+            return {
+              ...user,
+              ...updatedUser,
+              // Asegurarse de que isAdmin esté actualizado
+              isAdmin: updatedUser.isAdmin,
+            };
+          }
+          return user;
+        })
       );
 
       return { success: true, data: result };
@@ -148,16 +127,9 @@ export const useUsers = () => {
         throw new Error("ID de usuario inválido");
       }
 
-      const token = getToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(`http://localhost:3001/api/auth/${id}`, {
         method: "DELETE",
-        headers,
+        credentials: "include", // Envía cookies automáticamente
       });
 
       if (!response.ok) {

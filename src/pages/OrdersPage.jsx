@@ -108,15 +108,15 @@ export default function OrdersPage() {
   // Función para obtener el color del estado
   const getStatusColor = (status) => {
     switch (status) {
-      case "completed":
+      case "entregado":
         return "status-completed";
-      case "pending":
+      case "pendiente":
         return "status-pending";
-      case "shipped":
+      case "enviado":
         return "status-shipped";
-      case "processing":
+      case "confirmado":
         return "status-processing";
-      case "cancelled":
+      case "cancelado":
         return "status-cancelled";
       default:
         return "status-pending";
@@ -126,17 +126,15 @@ export default function OrdersPage() {
   // Función para traducir el estado
   const translateStatus = (status) => {
     switch (status) {
-      case "completed":
-        return "Completado";
-      case "pending":
+      case "entregado":
+        return "Entregado";
+      case "pendiente":
         return "Pendiente";
-      case "shipped":
+      case "enviado":
         return "Enviado";
-      case "paid":
-        return "Pagado";
-      case "processing":
-        return "Procesando";
-      case "cancelled":
+      case "confirmado":
+        return "Confirmado";
+      case "cancelado":
         return "Cancelado";
       default:
         return status;
@@ -144,12 +142,12 @@ export default function OrdersPage() {
   };
 
   // Calcular estadísticas
-  const totalRevenue = sales.reduce(
-    (sum, order) => sum + (order.totalPrice || 0),
-    0
-  );
-  const completedOrders = sales.filter((o) => o.status === "completed").length;
-  const pendingOrders = sales.filter((o) => o.status === "pending").length;
+  const totalRevenue = sales
+    .filter((order) => order.status === "entregado") // Solo pedidos entregados
+    .reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+  const completedOrders = sales.filter((o) => o.status === "entregado").length;
+  const pendingOrders = sales.filter((o) => o.status === "pendiente").length;
+  const cancelledOrders = sales.filter((o) => o.status === "cancelado").length;
 
   if (loading && sales.length === 0) {
     return (
@@ -261,16 +259,16 @@ export default function OrdersPage() {
             className="orders-page__status-select"
           >
             <option value="all">Todos los estados</option>
-            <option value="pending">Pendientes</option>
-            <option value="processing">Procesando</option>
-            <option value="shipped">Enviados</option>
-            <option value="completed">Completados</option>
-            <option value="cancelled">Cancelados</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="confirmado">Confirmados</option>
+            <option value="enviado">Enviados</option>
+            <option value="entregado">Entregados</option>
+            <option value="cancelado">Cancelados</option>
           </select>
         </div>
       </div>
 
-      {/* Tabla de pedidos */}
+      {/* Tabla de pedidos (Desktop) */}
       <div className="orders-page__table-container">
         <table className="orders-page__table">
           <thead>
@@ -357,6 +355,87 @@ export default function OrdersPage() {
         </table>
       </div>
 
+      {/* Cards de pedidos (Mobile) */}
+      <div className="orders-page__card-container">
+        {filteredOrders.length === 0 ? (
+          <div className="orders-page__no-results">
+            No se encontraron pedidos con los filtros aplicados
+          </div>
+        ) : (
+          filteredOrders.map((order) => (
+            <div key={order._id} className="orders-page__card">
+              <div className="orders-page__card-header">
+                <div className="orders-page__card-order-info">
+                  <div className="orders-page__card-order-number">
+                    #{order._id.slice(-8).toUpperCase()}
+                  </div>
+                  <div className="orders-page__card-date">
+                    <FiCalendar />
+                    {new Date(order.saleDate).toLocaleDateString("es-ES")}
+                  </div>
+                </div>
+                <div className="orders-page__card-status-wrapper">
+                  <span
+                    className={`orders-page__status ${getStatusColor(
+                      order.status
+                    )}`}
+                  >
+                    {translateStatus(order.status)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="orders-page__card-body">
+                <div className="orders-page__card-customer">
+                  <div className="orders-page__card-label">
+                    <FiUser />
+                    Cliente
+                  </div>
+                  <div className="orders-page__card-customer-name">
+                    {order.user?.name || "N/A"}
+                  </div>
+                  <div className="orders-page__card-customer-email">
+                    {order.user?.email || "N/A"}
+                  </div>
+                </div>
+
+                <div className="orders-page__card-total">
+                  <div className="orders-page__card-label">
+                    <FiDollarSign />
+                    Total
+                  </div>
+                  <div className="orders-page__card-total-amount">
+                    ${order.totalPrice.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+
+              <div className="orders-page__card-footer">
+                <button
+                  className="orders-page__card-action-btn orders-page__card-action-btn--view"
+                  onClick={() => handleViewOrder(order)}
+                >
+                  <FiEye />
+                  Ver Detalles
+                </button>
+                <button
+                  className="orders-page__card-action-btn orders-page__card-action-btn--edit"
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setNewStatus(order.status);
+                    setIsEditingStatus(true);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  <FiEdit />
+                  Editar
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
       {/* Modal de detalles del pedido */}
       {isModalOpen && selectedOrder && (
         <div
@@ -440,8 +519,8 @@ export default function OrdersPage() {
               <div className="orders-page__modal-section">
                 <h3>📦 Estado del Pedido</h3>
 
-                {/* Botón de confirmar pago para pedidos pending */}
-                {selectedOrder.status === "pending" && !isEditingStatus && (
+                {/* Botón de confirmar pago para pedidos pendientes */}
+                {selectedOrder.status === "pendiente" && !isEditingStatus && (
                   <div className="orders-page__confirm-payment">
                     <button
                       onClick={handleConfirmSale}
@@ -467,11 +546,11 @@ export default function OrdersPage() {
                       onChange={(e) => setNewStatus(e.target.value)}
                       className="orders-page__status-select"
                     >
-                      <option value="pending">Pendiente</option>
-                      <option value="paid">Pagado</option>
-                      <option value="shipped">Enviado</option>
-                      <option value="completed">Completado</option>
-                      <option value="cancelled">Cancelado</option>
+                      <option value="pendiente">Pendiente</option>
+                      <option value="confirmado">Confirmado</option>
+                      <option value="enviado">Enviado</option>
+                      <option value="entregado">Entregado</option>
+                      <option value="cancelado">Cancelado</option>
                     </select>
                     <div className="orders-page__modal-status-buttons">
                       <button

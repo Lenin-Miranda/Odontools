@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import "./UserModal.css";
 import { useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import userAvatar from "../../assets/avatar.png";
 import { CiHeart, CiUser, CiShoppingCart, CiDollar } from "react-icons/ci";
 import {
   FiUser,
@@ -19,6 +18,7 @@ import {
   FiTrendingUp,
   FiShield,
 } from "react-icons/fi";
+import { useSales } from "../../hooks/useSales";
 
 export default function UserModal({
   isUserOpen,
@@ -26,7 +26,27 @@ export default function UserModal({
   user,
   onLogout,
 }) {
+  const { getSalesByUser } = useSales();
+  const [userOrders, setUserOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
   console.log("UserModal user:", user);
+
+  // Cargar pedidos del usuario
+  useEffect(() => {
+    const loadUserOrders = async () => {
+      if (isUserOpen && user) {
+        setLoadingOrders(true);
+        const result = await getSalesByUser();
+        if (result.success) {
+          setUserOrders(result.data || []);
+        }
+        setLoadingOrders(false);
+      }
+    };
+
+    loadUserOrders();
+  }, [isUserOpen, user]);
 
   // Función para formatear fechas
   const formatDate = (dateString) => {
@@ -73,10 +93,9 @@ export default function UserModal({
 
   // Función para calcular estadísticas de usuario
   const getUserStats = () => {
-    const orders = user?.orders || [];
-    const totalOrders = orders.length;
-    const totalSpent = orders.reduce(
-      (sum, order) => sum + (order.price || 0),
+    const totalOrders = userOrders.length;
+    const totalSpent = userOrders.reduce(
+      (sum, order) => sum + (order.totalPrice || 0),
       0
     );
     const favoriteProducts = user?.favorites?.length || 0;
@@ -119,11 +138,9 @@ export default function UserModal({
           {/* User Info Section */}
           <div className="user__modal-user-info">
             <div className="user__modal-avatar-container">
-              <img
-                className="user__modal-avatar"
-                src={userAvatar}
-                alt="User Avatar"
-              />
+              <div className="user__modal-avatar-initial">
+                {user?.name?.charAt(0).toUpperCase() || "U"}
+              </div>
               <div className="user__modal-status-indicator active"></div>
             </div>
             <div className="user__modal-user-details">
@@ -169,7 +186,7 @@ export default function UserModal({
                 <span className="user__modal-stat-label">Gastado</span>
               </div>
             </div>
-            <div className="user__modal-stat-card">
+            {/* <div className="user__modal-stat-card">
               <FiHeart className="user__modal-stat-icon" />
               <div className="user__modal-stat-info">
                 <span className="user__modal-stat-number">
@@ -177,7 +194,7 @@ export default function UserModal({
                 </span>
                 <span className="user__modal-stat-label">Favoritos</span>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Personal Information */}
@@ -229,7 +246,11 @@ export default function UserModal({
               <li className="user__modal-item">
                 <FiUser className="user__modal-item-icon" />
                 <div className="user__modal-container-links">
-                  <Link to="/profile" className="user__modal-link">
+                  <Link
+                    to="/profile"
+                    className="user__modal-link"
+                    onClick={() => setIsUserOpen(false)}
+                  >
                     Editar Perfil
                   </Link>
                   <span className="user__modal-span">
@@ -241,7 +262,11 @@ export default function UserModal({
               <li className="user__modal-item">
                 <FiShoppingBag className="user__modal-item-icon" />
                 <div className="user__modal-container-links">
-                  <Link to="/orders" className="user__modal-link">
+                  <Link
+                    to="/orders"
+                    className="user__modal-link"
+                    onClick={() => setIsUserOpen(false)}
+                  >
                     Mis Pedidos
                   </Link>
                   <span className="user__modal-span">
@@ -250,29 +275,37 @@ export default function UserModal({
                 </div>
               </li>
 
-              <li className="user__modal-item">
+              {/* <li className="user__modal-item">
                 <FiHeart className="user__modal-item-icon" />
                 <div className="user__modal-container-links">
-                  <Link to="/favorites" className="user__modal-link">
+                  <Link
+                    to="/favorites"
+                    className="user__modal-link"
+                    onClick={() => setIsUserOpen(false)}
+                  >
                     Favoritos
                   </Link>
                   <span className="user__modal-span">
                     {stats.favoriteProducts} productos guardados
                   </span>
                 </div>
-              </li>
+              </li> */}
 
-              <li className="user__modal-item">
+              {/* <li className="user__modal-item">
                 <FiSettings className="user__modal-item-icon" />
                 <div className="user__modal-container-links">
-                  <Link to="/settings" className="user__modal-link">
+                  <Link
+                    to="/settings"
+                    className="user__modal-link"
+                    onClick={() => setIsUserOpen(false)}
+                  >
                     Configuración
                   </Link>
                   <span className="user__modal-span">
                     Preferencias y privacidad
                   </span>
                 </div>
-              </li>
+              </li> */}
             </ul>
           </div>
 

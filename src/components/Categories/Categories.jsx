@@ -4,9 +4,14 @@ export default function Categories({ categories, onCategoryClick, products }) {
   const limitedCategories =
     categories.length >= 4 ? categories.slice(0, 4) : categories;
 
-  const categoriesList = limitedCategories.map((category) => {
+  const categoriesList = limitedCategories.map((category, index) => {
     return (
-      <li className="categories__list-item" key={category.id}>
+      <li
+        className="categories__list-item"
+        key={category.id}
+        data-aos="zoom-in"
+        data-aos-delay={index * 100}
+      >
         {" "}
         <img
           className="categories__image"
@@ -26,7 +31,7 @@ export default function Categories({ categories, onCategoryClick, products }) {
   });
   return (
     <section className="categories" id="categories">
-      <div className="categories__header">
+      <div className="categories__header" data-aos="fade-up">
         <h2 className="categories__title">Comprar por categoria</h2>
         <p className="categories__description">
           Explora nuestra amplia gama de porductos dentales organizados por

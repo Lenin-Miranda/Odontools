@@ -4,14 +4,18 @@ import { FaPhone, FaEnvelope, FaMap } from "react-icons/fa";
 export default function Contact() {
   return (
     <section className="contact" id="contact">
-      <div className="contact__container">
+      <div className="contact__container" data-aos="fade-up">
         <h2 className="contact__container-title">Ponte en Contacto</h2>
         <p className="contact__container-description">
           ¿Tienes preguntas sobre nuestros productos o necesitas asistencia?
           Nuestro equipo de expertos está aquí para ayudarte.
         </p>
         <ul className="contact__container-list">
-          <li className="contact__container-list-item">
+          <li
+            className="contact__container-list-item"
+            data-aos="zoom-in"
+            data-aos-delay="100"
+          >
             <i className="contact__container-list-item-icon">
               <FaPhone />
             </i>
@@ -23,7 +27,11 @@ export default function Contact() {
               Lun-Vie 8AM-6PM EST
             </span>
           </li>
-          <li className="contact__container-list-item">
+          <li
+            className="contact__container-list-item"
+            data-aos="zoom-in"
+            data-aos-delay="200"
+          >
             {" "}
             <i className="contact__container-list-item-icon">
               <FaEnvelope />
@@ -38,7 +46,11 @@ export default function Contact() {
               Soporte 24/7
             </span>
           </li>
-          <li className="contact__container-list-item">
+          <li
+            className="contact__container-list-item"
+            data-aos="zoom-in"
+            data-aos-delay="300"
+          >
             {" "}
             <i className="contact__container-list-item-icon">
               <FaMap />

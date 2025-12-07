@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   FiHome,
   FiBox,
@@ -10,15 +10,21 @@ import {
   FiMenu,
   FiX,
 } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./AdminNavBar.css";
 
 export default function AdminNavBar() {
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     // Aquí irá la lógica de logout cuando conectes el backend
@@ -87,7 +93,7 @@ export default function AdminNavBar() {
             <span>Usuarios</span>
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="/admin/analytics"
             className={({ isActive }) =>
               `admin-navbar__link ${
@@ -97,7 +103,7 @@ export default function AdminNavBar() {
           >
             <FiBarChart />
             <span>Analytics</span>
-          </NavLink>
+          </NavLink> */}
         </div>
 
         {/* User Menu */}
@@ -144,7 +150,9 @@ export default function AdminNavBar() {
       >
         <NavLink
           to="/admin"
-          className="admin-navbar__mobile-link"
+          className={({ isActive }) =>
+            `admin-navbar__mobile-link ${isActive ? "active" : ""}`
+          }
           onClick={() => setIsMobileMenuOpen(false)}
           end
         >
@@ -154,7 +162,9 @@ export default function AdminNavBar() {
 
         <NavLink
           to="/admin/products"
-          className="admin-navbar__mobile-link"
+          className={({ isActive }) =>
+            `admin-navbar__mobile-link ${isActive ? "active" : ""}`
+          }
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <FiBox />
@@ -163,7 +173,9 @@ export default function AdminNavBar() {
 
         <NavLink
           to="/admin/orders"
-          className="admin-navbar__mobile-link"
+          className={({ isActive }) =>
+            `admin-navbar__mobile-link ${isActive ? "active" : ""}`
+          }
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <FiShoppingCart />
@@ -172,25 +184,31 @@ export default function AdminNavBar() {
 
         <NavLink
           to="/admin/users"
-          className="admin-navbar__mobile-link"
+          className={({ isActive }) =>
+            `admin-navbar__mobile-link ${isActive ? "active" : ""}`
+          }
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <FiUsers />
           <span>Usuarios</span>
         </NavLink>
 
-        <NavLink
+        {/* <NavLink
           to="/admin/analytics"
-          className="admin-navbar__mobile-link"
+          className={({ isActive }) =>
+            `admin-navbar__mobile-link ${isActive ? "active" : ""}`
+          }
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <FiBarChart />
           <span>Analytics</span>
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="/admin/settings"
-          className="admin-navbar__mobile-link"
+          className={({ isActive }) =>
+            `admin-navbar__mobile-link ${isActive ? "active" : ""}`
+          }
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <FiSettings />
