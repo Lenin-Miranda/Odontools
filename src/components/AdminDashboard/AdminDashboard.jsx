@@ -1,5 +1,4 @@
 import "./AdminDashboard.css";
-import { ordersData } from "../../data/ordersData";
 import {
   FiBox,
   FiUsers,
@@ -10,6 +9,7 @@ import {
 import { RiErrorWarningLine } from "react-icons/ri";
 import ProductModal from "../ProductModal/ProductModal";
 import { useProducts } from "../../hooks/useProducts";
+import { useSales } from "../../hooks/useSales";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -33,13 +33,17 @@ export default function AdminDashboard() {
     fetchProducts,
   } = useProducts();
 
-  // useEffect para cargar productos al montar el componente
+  // Hook para obtener pedidos
+  const { sales, loading: salesLoading, fetchSales } = useSales();
+
+  // useEffect para cargar productos y pedidos al montar el componente
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadData = async () => {
       await fetchProducts();
+      await fetchSales();
     };
 
-    loadProducts();
+    loadData();
   }, []);
 
   // useEffect para actualizar productos de poco stock cuando cambie la lista de productos
@@ -85,6 +89,56 @@ export default function AdminDashboard() {
     setModalMode("create");
   };
 
+  // Función para traducir estados
+  const translateStatus = (status) => {
+    switch (status) {
+      case "entregado":
+        return "Entregado";
+      case "pendiente":
+        return "Pendiente";
+      case "enviado":
+        return "Enviado";
+      case "confirmado":
+        return "Confirmado";
+      case "cancelado":
+        return "Cancelado";
+      default:
+        return status;
+    }
+  };
+
+  // Función para obtener el color del estado
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "entregado":
+        return "#10b981"; // Verde
+      case "pendiente":
+        return "#f59e0b"; // Naranja
+      case "enviado":
+        return "#3b82f6"; // Azul
+      case "confirmado":
+        return "#8b5cf6"; // Morado
+      case "cancelado":
+        return "#ef4444"; // Rojo
+      default:
+        return "#6b7280"; // Gris
+    }
+  };
+
+  // Calcular ventas totales
+  const totalSales = sales.reduce(
+    (sum, sale) => sum + (sale.totalPrice || 0),
+    0
+  );
+
+  // Contar pedidos totales
+  const totalOrders = sales.length;
+
+  // Obtener los últimos 5 pedidos
+  const recentOrders = sales
+    .sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate))
+    .slice(0, 5);
+
   return (
     <div className="admin__dashboard">
       <h1 className="admin__dashboard-title">Acciones Rapidas</h1>
@@ -123,7 +177,9 @@ export default function AdminDashboard() {
               <FiDollarSign />
             </span>
           </h2>
-          <h3 className="admin__dashboard-stat-subtitle">$40,000</h3>
+          <h3 className="admin__dashboard-stat-subtitle">
+            ${salesLoading ? "..." : totalSales.toFixed(2)}
+          </h3>
           <h3 className="admin__dashboard-stat-info">
             Numero total de ventas realizadas
           </h3>
@@ -137,7 +193,9 @@ export default function AdminDashboard() {
               />
             </span>
           </h2>
-          <h3 className="admin__dashboard-stat-subtitle">200</h3>
+          <h3 className="admin__dashboard-stat-subtitle">
+            {salesLoading ? "..." : totalOrders}
+          </h3>
           <h3 className="admin__dashboard-stat-info">
             Numero total de pedidos realizados
           </h3>
@@ -182,51 +240,60 @@ export default function AdminDashboard() {
         <div className="admin__dashboard-board">
           <h2 className="admin__dashboard-board-title">Pedidos Recientes</h2>
           <p className="admin__dashboard-board-subtitle">
-            Los ultimos pedidos realizados
+            Los últimos pedidos realizados
           </p>
-          <ul className="admin__dashboard-board-orders">
-            {ordersData.map((order) => {
-              return (
-                <li key={order.id} className="admin__dashboard-board-order">
-                  <div className="admin__dashboard-board-order-container">
-                    <span className="admin__dashboard-board-order-text">
-                      {order.customer}
-                    </span>
-                    <span className="admin__dashboard-board-order-text">
-                      {order.date}
-                    </span>
-                  </div>
-                  <div className="admin__dashboard-board-order-container">
-                    <span
-                      className="admin__dashboard-board-order-text"
-                      style={{ textAlign: "right" }}
-                    >
-                      ${order.total}
-                    </span>
-                    <span
-                      className={`admin__dashboard-board-order-status admin__dashboard-board-order-status-${order.status
-                        .toLowerCase()
-                        .replace(" ", "-")}`}
-                      style={{
-                        width: "90px",
-                        padding: "5px",
-                        height: "28px",
-                        backgroundColor: "#000",
-                        color: "#fff",
-                        borderRadius: "50px",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        textAlign: "center",
-                      }}
-                    >
-                      {order.status}
-                    </span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          <button className="admin__dashboard-button">
+          {salesLoading ? (
+            <div className="admin__dashboard-loading">
+              <p>Cargando pedidos...</p>
+            </div>
+          ) : recentOrders.length === 0 ? (
+            <p className="admin__dashboard-empty">No hay pedidos recientes</p>
+          ) : (
+            <ul className="admin__dashboard-board-orders">
+              {recentOrders.map((order) => {
+                return (
+                  <li key={order._id} className="admin__dashboard-board-order">
+                    <div className="admin__dashboard-board-order-container">
+                      <span className="admin__dashboard-board-order-text">
+                        {order.user?.name || "Cliente desconocido"}
+                      </span>
+                      <span className="admin__dashboard-board-order-text">
+                        {new Date(order.saleDate).toLocaleDateString("es-ES")}
+                      </span>
+                    </div>
+                    <div className="admin__dashboard-board-order-container">
+                      <span
+                        className="admin__dashboard-board-order-text"
+                        style={{ textAlign: "right" }}
+                      >
+                        ${order.totalPrice.toFixed(2)}
+                      </span>
+                      <span
+                        className={`admin__dashboard-board-order-status admin__dashboard-board-order-status-${order.status}`}
+                        style={{
+                          width: "90px",
+                          padding: "5px",
+                          height: "28px",
+                          backgroundColor: getStatusColor(order.status),
+                          color: "#fff",
+                          borderRadius: "50px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                          textAlign: "center",
+                        }}
+                      >
+                        {translateStatus(order.status)}
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <button
+            className="admin__dashboard-button"
+            onClick={() => navigate("/admin/orders")}
+          >
             Ver todos los pedidos
           </button>
         </div>

@@ -11,19 +11,6 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      // Obtener token de localStorage
-      const token =
-        localStorage.getItem("token") ||
-        localStorage.getItem("authToken") ||
-        localStorage.getItem("accessToken") ||
-        localStorage.getItem("jwt") ||
-        localStorage.getItem("access_token");
-
-      const headers = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       console.log("📤 Enviando producto al backend...");
 
       // Verificar si hay imagen en FormData
@@ -41,7 +28,7 @@ export const useProducts = () => {
 
       const response = await fetch("http://localhost:3001/api/products", {
         method: "POST",
-        headers, // Sin Content-Type para FormData
+        credentials: "include", // Envía cookies automáticamente
         body: formData, // Enviar FormData directamente
       });
 
@@ -79,20 +66,6 @@ export const useProducts = () => {
       }
 
       console.log(`📝 Actualizando producto con ID: ${id}`);
-
-      // Obtener token de localStorage
-      const token =
-        localStorage.getItem("token") ||
-        localStorage.getItem("authToken") ||
-        localStorage.getItem("accessToken") ||
-        localStorage.getItem("jwt") ||
-        localStorage.getItem("access_token");
-
-      const headers = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       console.log(`📤 Actualizando producto ${id}...`);
 
       // Verificar si hay imagen nueva
@@ -107,7 +80,7 @@ export const useProducts = () => {
 
       const response = await fetch(`http://localhost:3001/api/products/${id}`, {
         method: "PUT",
-        headers, // Sin Content-Type para FormData
+        credentials: "include", // Envía cookies automáticamente
         body: formData, // Enviar FormData directamente
       });
 
@@ -150,22 +123,9 @@ export const useProducts = () => {
 
       console.log(`🗑️ Eliminando producto con ID: ${id}`);
 
-      // Obtener token de localStorage
-      const token =
-        localStorage.getItem("token") ||
-        localStorage.getItem("authToken") ||
-        localStorage.getItem("accessToken") ||
-        localStorage.getItem("jwt") ||
-        localStorage.getItem("access_token");
-
-      const headers = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(`http://localhost:3001/api/products/${id}`, {
         method: "DELETE",
-        headers,
+        credentials: "include", // Envía cookies automáticamente
       });
 
       if (!response.ok) {
@@ -200,20 +160,8 @@ export const useProducts = () => {
 
       console.log(`🔍 Obteniendo producto con ID: ${id}`);
 
-      const token =
-        localStorage.getItem("token") ||
-        localStorage.getItem("authToken") ||
-        localStorage.getItem("accessToken") ||
-        localStorage.getItem("jwt") ||
-        localStorage.getItem("access_token");
-
-      const headers = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(`http://localhost:3001/api/products/${id}`, {
-        headers,
+        credentials: "include", // Envía cookies automáticamente
       });
 
       if (!response.ok) {
@@ -239,21 +187,8 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      // Obtener token de localStorage
-      const token =
-        localStorage.getItem("token") ||
-        localStorage.getItem("authToken") ||
-        localStorage.getItem("accessToken") ||
-        localStorage.getItem("jwt") ||
-        localStorage.getItem("access_token");
-
-      const headers = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch("http://localhost:3001/api/products", {
-        headers,
+        credentials: "include", // Envía cookies automáticamente
       });
 
       if (!response.ok) {
@@ -283,6 +218,7 @@ export const useProducts = () => {
     Object.keys(productData).forEach((key) => {
       if (
         key !== "image" &&
+        key !== "images" &&
         productData[key] !== null &&
         productData[key] !== undefined
       ) {
@@ -290,12 +226,78 @@ export const useProducts = () => {
       }
     });
 
-    // Agregar imagen si existe
+    // Agregar imagen principal si existe
     if (productData.image && productData.image instanceof File) {
       formData.append("image", productData.image);
     }
 
+    // Agregar múltiples imágenes si existen
+    if (productData.images && Array.isArray(productData.images)) {
+      productData.images.forEach((img) => {
+        if (img instanceof File) {
+          formData.append("images", img);
+        }
+      });
+    }
+
     return formData;
+  };
+
+  // Eliminar una imagen específica de la galería de un producto
+  const deleteProductImage = async (productId, imageUrl) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (!productId || productId === "undefined" || productId === undefined) {
+        throw new Error("ID de producto inválido");
+      }
+
+      if (!imageUrl) {
+        throw new Error("URL de imagen requerida");
+      }
+
+      console.log(`🗑️ Eliminando imagen del producto ${productId}:`, imageUrl);
+
+      const response = await fetch(
+        `http://localhost:3001/api/products/${productId}/image`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ imageUrl }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Error al eliminar la imagen del producto"
+        );
+      }
+
+      const result = await response.json();
+      console.log("✅ Imagen eliminada exitosamente");
+
+      // Actualizar el producto en la lista local
+      setProducts((prev) =>
+        prev.map((product) =>
+          product._id === productId || product.id === productId
+            ? result.product
+            : product
+        )
+      );
+
+      return { success: true, data: result.product };
+    } catch (err) {
+      console.error("❌ Error al eliminar imagen:", err);
+      setError(err.message);
+      return { success: false, error: err.message };
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {
@@ -308,6 +310,7 @@ export const useProducts = () => {
     fetchProducts,
     fetchProductById,
     createFormData,
+    deleteProductImage,
     setProducts, // Para actualizar manualmente la lista
     setError, // Para limpiar errores manualmente
   };

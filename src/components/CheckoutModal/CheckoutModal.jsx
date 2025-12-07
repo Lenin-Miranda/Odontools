@@ -11,7 +11,9 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
 
   const [formData, setFormData] = useState({
     paymentMethod: "cash",
+    email: userInfo?.email || "",
     shippingAddress: "",
+    phone: userInfo?.phone || "",
     bankAccountName: "",
     bankAccountNumber: "",
   });
@@ -22,10 +24,12 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
 
   // ✅ Actualizar la dirección cuando userInfo cambie o cuando se abra el modal
   useEffect(() => {
-    if (isOpen && userInfo?.address) {
+    if (isOpen && userInfo) {
       setFormData((prev) => ({
         ...prev,
-        shippingAddress: userInfo.address,
+        shippingAddress: userInfo.address || prev.shippingAddress,
+        email: userInfo.email || prev.email,
+        phone: userInfo.phone || prev.phone,
       }));
     }
   }, [isOpen, userInfo]);
@@ -53,6 +57,16 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
       return;
     }
 
+    if (!formData.email.trim()) {
+      setError("Por favor ingresa tu correo electronico");
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      setError("Por favor ingresa tu número de teléfono");
+      return;
+    }
+
     // Validar datos bancarios si es transferencia
     if (formData.paymentMethod === "transfer") {
       if (!formData.bankAccountName.trim()) {
@@ -66,10 +80,28 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
     }
 
     try {
+      // Actualizar el perfil del usuario si el teléfono es nuevo o diferente
+      if (formData.phone && formData.phone !== userInfo?.phone) {
+        try {
+          await fetch(`http://localhost:3001/api/auth/${userInfo._id}`, {
+            method: "PUT",
+            credentials: "include", // Envía cookies automáticamente
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ phone: formData.phone }),
+          });
+        } catch (err) {
+          console.error("Error al actualizar el teléfono:", err);
+        }
+      }
+
       // Crear la venta
       const salePayload = {
         paymentMethod: formData.paymentMethod,
         shippingAddress: formData.shippingAddress,
+        email: formData.email,
+        phone: formData.phone,
       };
 
       // Agregar datos bancarios si es transferencia
@@ -98,7 +130,9 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
   const resetForm = () => {
     setFormData({
       paymentMethod: "cash",
-      shippingAddress: "",
+      email: userInfo?.email || "",
+      shippingAddress: userInfo?.address || "",
+      phone: userInfo?.phone || "",
       bankAccountName: "",
       bankAccountNumber: "",
     });
@@ -224,16 +258,38 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
 
             {/* Dirección de envío */}
             <div className="checkout-section">
-              <h3 className="checkout-section-title">📍 Dirección de Envío</h3>
-              <textarea
-                name="shippingAddress"
-                value={formData.shippingAddress}
-                onChange={handleChange}
-                placeholder="Ingresa tu dirección completa (calle, número, colonia, ciudad, código postal)"
-                className="checkout-textarea"
-                rows="4"
-                required
-              />
+              <h3 className="checkout-section-title">
+                📍 Información de Contacto
+              </h3>
+
+              <div className="checkout-input-group">
+                <label htmlFor="phone">Número de Teléfono *</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Ej: +52 123 456 7890"
+                  className="checkout-input"
+                  required
+                />
+              </div>
+
+              <div className="checkout-input-group">
+                <label htmlFor="shippingAddress">Dirección de Envío *</label>
+                <textarea
+                  id="shippingAddress"
+                  name="shippingAddress"
+                  value={formData.shippingAddress}
+                  onChange={handleChange}
+                  placeholder="Ingresa tu dirección completa (calle, número, colonia, ciudad, código postal)"
+                  className="checkout-textarea"
+                  rows="4"
+                  required
+                />
+              </div>
+
               <p className="checkout-hint">
                 📧 Recibirás la confirmación de tu pedido por correo electrónico
               </p>

@@ -26,7 +26,7 @@ export default function UserEditModal({
         name: user.name || "",
         email: user.email || "",
         phone: user.phone || "",
-        role: user.role || "cliente",
+        role: user.isAdmin ? "admin" : user.role || "cliente",
         status: user.status || "active",
       });
     } else {
@@ -72,7 +72,14 @@ export default function UserEditModal({
       return;
     }
 
-    await onSubmit(formData);
+    // Preparar datos para el backend
+    const dataToSend = {
+      name: formData.name,
+      email: formData.email,
+      isAdmin: formData.role === "admin", // Convertir role a isAdmin
+    };
+
+    await onSubmit(dataToSend);
   };
 
   const handleBackdropClick = (e) => {
@@ -176,7 +183,6 @@ export default function UserEditModal({
                 >
                   <option value="cliente">Cliente</option>
                   <option value="admin">Administrador</option>
-                  <option value="moderator">Moderador</option>
                 </select>
               </div>
             </div>

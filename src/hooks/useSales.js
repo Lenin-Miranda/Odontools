@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { handleAuthError, getAuthToken } from "../utils/auth";
+import { handleAuthError } from "../utils/auth";
 
 export const useSales = () => {
   const [sales, setSales] = useState([]);
@@ -12,19 +12,12 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch("http://localhost:3001/api/sales", {
-        headers,
+        credentials: "include", // Envía cookies automáticamente
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }
@@ -52,23 +45,17 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch("http://localhost:3001/api/sales", {
         method: "POST",
-        headers,
+        credentials: "include", // Envía cookies automáticamente
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(saleData),
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }
@@ -96,19 +83,12 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch("http://localhost:3001/api/sales/user", {
-        headers,
+        credentials: "include", // Envía cookies automáticamente
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }
@@ -136,22 +116,15 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(
         `http://localhost:3001/api/sales/${saleId}`,
         {
-          headers,
+          credentials: "include", // Envía cookies automáticamente
         }
       );
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }
@@ -177,26 +150,20 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(
         `http://localhost:3001/api/sales/${saleId}/status`,
         {
           method: "PUT",
-          headers,
+          credentials: "include", // Envía cookies automáticamente
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ status }),
         }
       );
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }
@@ -229,25 +196,20 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(
-        `http://localhost:3001/api/sales/${saleId}/confirm`,
+        `http://localhost:3001/api/sales/${saleId}/status`,
         {
           method: "PUT",
-          headers,
+          credentials: "include", // Envía cookies automáticamente
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: "confirmado" }),
         }
       );
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }
@@ -263,7 +225,7 @@ export const useSales = () => {
       // Actualizar la lista local
       setSales((prev) =>
         prev.map((sale) =>
-          sale._id === saleId ? { ...sale, status: "paid" } : sale
+          sale._id === saleId ? { ...sale, status: "confirmado" } : sale
         )
       );
 
@@ -282,22 +244,15 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(
         `http://localhost:3001/api/sales/${saleId}/export`,
         {
-          headers,
+          credentials: "include", // Envía cookies automáticamente
         }
       );
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }
@@ -333,22 +288,15 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(
         "http://localhost:3001/api/sales/csv-export",
         {
-          headers,
+          credentials: "include", // Envía cookies automáticamente
         }
       );
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }
@@ -390,22 +338,15 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(
         "http://localhost:3001/api/sales/user/csv-export",
         {
-          headers,
+          credentials: "include", // Envía cookies automáticamente
         }
       );
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(response)) {
+      if (await handleAuthError(response)) {
         setLoading(false);
         return { success: false, error: "Sesión expirada" };
       }

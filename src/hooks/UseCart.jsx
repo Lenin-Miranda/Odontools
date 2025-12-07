@@ -1,38 +1,38 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { handleAuthError, getAuthToken } from "../utils/auth";
+import { handleAuthError } from "../utils/auth";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
-  const [currentToken, setCurrentToken] = useState(
-    localStorage.getItem("token")
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("isLoggedIn") === "true"
   );
 
-  // ✅ Cargar el carrito cuando cambie el token (login/logout)
+  // ✅ Cargar el carrito cuando el usuario esté logueado
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-    // Si el token cambió, actualizar y recargar carrito
-    if (token !== currentToken) {
-      setCurrentToken(token);
-      if (token) {
+    // Si el estado de login cambió
+    if (loggedIn !== isLoggedIn) {
+      setIsLoggedIn(loggedIn);
+      if (loggedIn) {
         fetchCart();
       } else {
-        setCart([]); // Limpiar carrito si no hay token
+        setCart([]); // Limpiar carrito si no hay sesión
       }
-    } else if (token) {
-      fetchCart(); // Cargar carrito inicial si hay token
+    } else if (loggedIn) {
+      fetchCart(); // Cargar carrito inicial si hay sesión
     }
-  }, [currentToken]);
+  }, [isLoggedIn]);
 
   // ✅ Escuchar cambios en localStorage (login/logout desde otra pestaña o componente)
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === "token" || e.key === "authToken") {
-        const newToken = localStorage.getItem("token");
-        if (newToken !== currentToken) {
-          setCurrentToken(newToken);
+      if (e.key === "isLoggedIn") {
+        const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+        if (loggedIn !== isLoggedIn) {
+          setIsLoggedIn(loggedIn);
         }
       }
     };
@@ -41,9 +41,9 @@ export function CartProvider({ children }) {
 
     // También verificar cambios periódicamente (para cambios en la misma pestaña)
     const interval = setInterval(() => {
-      const token = localStorage.getItem("token");
-      if (token !== currentToken) {
-        setCurrentToken(token);
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      if (loggedIn !== isLoggedIn) {
+        setIsLoggedIn(loggedIn);
       }
     }, 1000);
 
@@ -51,26 +51,26 @@ export function CartProvider({ children }) {
       window.removeEventListener("storage", handleStorageChange);
       clearInterval(interval);
     };
-  }, [currentToken]);
+  }, [isLoggedIn]);
 
   const fetchCart = async () => {
     try {
-      const token = getAuthToken();
-      if (!token) {
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      if (!loggedIn) {
         setCart([]);
         return;
       }
 
       const res = await fetch("http://localhost:3001/api/cart", {
         method: "GET",
+        credentials: "include", // Envía cookies automáticamente
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(res)) {
+      if (await handleAuthError(res)) {
         setCart([]);
         return;
       }
@@ -84,10 +84,10 @@ export function CartProvider({ children }) {
     }
   };
 
-  const addToCart = async (product) => {
+  const addToCart = async (product, quantity = 1) => {
     try {
-      const token = getAuthToken();
-      if (!token) {
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      if (!loggedIn) {
         alert("Debes iniciar sesión para agregar productos al carrito");
         window.location.href = "/";
         return;
@@ -95,15 +95,15 @@ export function CartProvider({ children }) {
 
       const res = await fetch("http://localhost:3001/api/cart/add", {
         method: "POST",
+        credentials: "include", // Envía cookies automáticamente
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ productId: product._id, quantity: 1 }),
+        body: JSON.stringify({ productId: product._id, quantity }),
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(res)) {
+      if (await handleAuthError(res)) {
         return;
       }
 
@@ -143,19 +143,19 @@ export function CartProvider({ children }) {
 
   const removeFromCart = async (id) => {
     try {
-      const token = getAuthToken();
-      if (!token) return;
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      if (!loggedIn) return;
 
       const res = await fetch(`http://localhost:3001/api/cart/decrease/${id}`, {
         method: "POST",
+        credentials: "include", // Envía cookies automáticamente
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(res)) {
+      if (await handleAuthError(res)) {
         return;
       }
 
@@ -170,19 +170,19 @@ export function CartProvider({ children }) {
 
   const clearCart = async () => {
     try {
-      const token = getAuthToken();
-      if (!token) return;
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      if (!loggedIn) return;
 
       const res = await fetch("http://localhost:3001/api/cart/clear", {
         method: "DELETE",
+        credentials: "include", // Envía cookies automáticamente
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(res)) {
+      if (await handleAuthError(res)) {
         return;
       }
 
@@ -199,19 +199,19 @@ export function CartProvider({ children }) {
 
   const deleteItem = async (id) => {
     try {
-      const token = getAuthToken();
-      if (!token) return;
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      if (!loggedIn) return;
 
       const res = await fetch(`http://localhost:3001/api/cart/${id}`, {
         method: "DELETE",
+        credentials: "include", // Envía cookies automáticamente
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(res)) {
+      if (await handleAuthError(res)) {
         return;
       }
 
@@ -226,19 +226,19 @@ export function CartProvider({ children }) {
 
   const increaseQuantity = async (id) => {
     try {
-      const token = getAuthToken();
-      if (!token) return;
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      if (!loggedIn) return;
 
       const res = await fetch(`http://localhost:3001/api/cart/increase/${id}`, {
         method: "POST",
+        credentials: "include", // Envía cookies automáticamente
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
       // ✅ Manejar error de autenticación
-      if (handleAuthError(res)) {
+      if (await handleAuthError(res)) {
         return;
       }
 

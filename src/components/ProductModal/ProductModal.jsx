@@ -24,13 +24,19 @@ export default function ProductModal({
     isFavorite:
       mode === "edit" || mode === "view" ? product?.isFavorite || false : false,
     image: null,
+    images: [], // Array para imágenes adicionales
   });
 
   const [imagePreview, setImagePreview] = useState(
     mode === "edit" || mode === "view" ? product?.image || null : null
   );
+  const [additionalPreviews, setAdditionalPreviews] = useState(
+    mode === "edit" || mode === "view" ? product?.images || [] : []
+  );
   const [dragActive, setDragActive] = useState(false);
+  const [dragActiveGallery, setDragActiveGallery] = useState(false);
   const fileInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
 
   // Actualizar el formulario cuando cambie el producto o el modo
   useEffect(() => {
@@ -46,8 +52,10 @@ export default function ProductModal({
         discount: false,
         isFavorite: false,
         image: null,
+        images: [],
       });
       setImagePreview(null);
+      setAdditionalPreviews([]);
     } else if ((mode === "edit" || mode === "view") && product) {
       // Cargar datos del producto para editar o ver
       setFormData({
@@ -60,8 +68,10 @@ export default function ProductModal({
         discount: product.discount || false,
         isFavorite: product.isFavorite || false,
         image: null, // La imagen existente se maneja por separado
+        images: [],
       });
       setImagePreview(product.image || null);
+      setAdditionalPreviews(product.images || []);
     }
   }, [mode, product]);
 
@@ -116,6 +126,72 @@ export default function ProductModal({
     }
   };
 
+  // Manejar galería de imágenes adicionales
+  const handleGalleryChange = (files) => {
+    const fileArray = Array.from(files);
+    const validFiles = fileArray.filter((file) =>
+      file.type.startsWith("image/")
+    );
+
+    // Limitar a 4 imágenes adicionales
+    const filesToAdd = validFiles.slice(0, 4 - formData.images.length);
+
+    if (filesToAdd.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...filesToAdd],
+      }));
+
+      // Crear previews
+      const newPreviews = [];
+      filesToAdd.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          newPreviews.push(e.target.result);
+          if (newPreviews.length === filesToAdd.length) {
+            setAdditionalPreviews((prev) => [...prev, ...newPreviews]);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const handleGallerySelect = (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleGalleryChange(files);
+    }
+  };
+
+  const handleGalleryDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActiveGallery(true);
+    } else if (e.type === "dragleave") {
+      setDragActiveGallery(false);
+    }
+  };
+
+  const handleGalleryDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActiveGallery(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleGalleryChange(e.dataTransfer.files);
+    }
+  };
+
+  const removeGalleryImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+    setAdditionalPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -130,8 +206,16 @@ export default function ProductModal({
     submitData.append("discount", formData.discount);
     submitData.append("isFavorite", formData.isFavorite);
 
+    // Agregar imagen principal
     if (formData.image) {
       submitData.append("image", formData.image);
+    }
+
+    // Agregar imágenes adicionales
+    if (formData.images && formData.images.length > 0) {
+      formData.images.forEach((img) => {
+        submitData.append("images", img);
+      });
     }
 
     onSubmit(submitData);
@@ -148,8 +232,10 @@ export default function ProductModal({
       discount: false,
       isFavorite: false,
       image: null,
+      images: [],
     });
     setImagePreview(null);
+    setAdditionalPreviews([]);
   };
 
   const handleClose = () => {
@@ -222,6 +308,135 @@ export default function ProductModal({
               type="file"
               accept="image/*"
               onChange={handleFileSelect}
+              className="product-modal__file-input"
+            />
+          </div>
+
+          {/* Galería de imágenes adicionales */}
+          <div className="product-modal__field">
+            <label className="product-modal__label">
+              Imágenes Adicionales (Galería)
+              <span
+                style={{
+                  fontSize: "0.85rem",
+                  color: "#666",
+                  marginLeft: "0.5rem",
+                }}
+              >
+                Máximo 4 imágenes
+              </span>
+            </label>
+
+            {/* Drag and drop area para galería */}
+            <div
+              className={`product-modal__image-upload ${
+                dragActiveGallery ? "drag-active" : ""
+              } ${mode === "view" ? "read-only" : ""}`}
+              style={{ minHeight: "120px" }}
+              onDragEnter={mode !== "view" ? handleGalleryDrag : undefined}
+              onDragLeave={mode !== "view" ? handleGalleryDrag : undefined}
+              onDragOver={mode !== "view" ? handleGalleryDrag : undefined}
+              onDrop={mode !== "view" ? handleGalleryDrop : undefined}
+              onClick={
+                mode !== "view"
+                  ? () => galleryInputRef.current?.click()
+                  : undefined
+              }
+            >
+              {additionalPreviews.length === 0 ? (
+                <div className="product-modal__upload-placeholder">
+                  <FiImage size={36} />
+                  <p>Arrastra imágenes adicionales aquí o haz click</p>
+                  <span className="product-modal__upload-hint">
+                    Máximo 4 imágenes para la galería
+                  </span>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(100px, 1fr))",
+                    gap: "0.75rem",
+                    padding: "1rem",
+                  }}
+                >
+                  {additionalPreviews.map((preview, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        position: "relative",
+                        aspectRatio: "1",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        border: "2px solid #e2e8f0",
+                      }}
+                    >
+                      <img
+                        src={preview}
+                        alt={`Galería ${index + 1}`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      {mode !== "view" && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeGalleryImage(index);
+                          }}
+                          style={{
+                            position: "absolute",
+                            top: "4px",
+                            right: "4px",
+                            background: "rgba(239, 68, 68, 0.9)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "24px",
+                            height: "24px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            fontSize: "16px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {additionalPreviews.length < 4 && mode !== "view" && (
+                    <div
+                      style={{
+                        aspectRatio: "1",
+                        border: "2px dashed #cbd5e1",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#94a3b8",
+                        fontSize: "2rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      +
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleGallerySelect}
               className="product-modal__file-input"
             />
           </div>

@@ -42,7 +42,7 @@ export default function SearchBar() {
   const handleSelect = (id) => {
     setQuery("");
     setResults([]);
-    navigate(`/product/${id}`);
+    navigate(`/products/${id}`);
   };
 
   return (

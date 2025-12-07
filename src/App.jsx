@@ -4,6 +4,8 @@ import Header from "./components/Header/Header";
 import Main from "./components/Main/Main";
 import Footer from "./components/Footer/Footer";
 import "./App.css";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import { products } from "./data/productsData";
 import { categories } from "./data/categoriesData";
 import { Route, Routes } from "react-router";
@@ -26,6 +28,9 @@ import UserOrdersPage from "./pages/UserOrdersPage";
 import UserFavoritesPage from "./pages/UserFavoritesPage";
 import UserSettingsPage from "./pages/UserSettingsPage";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import NotFoundPage from "./pages/NotFoundPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import HomePage from "./components/HomePage/HomePage";
 
 function App() {
   // Estados principales
@@ -47,6 +52,21 @@ function App() {
     isAdmin: false,
   });
   const [isUserOpen, setIsUserOpen] = useState(false);
+
+  // useEffect para inicializar AOS
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100,
+      easing: "ease-in-out",
+    });
+
+    // Refrescar AOS después de un pequeño delay
+    setTimeout(() => {
+      AOS.refresh();
+    }, 100);
+  }, []);
 
   // useEffect para verificar si hay un usuario logueado en localStorage al cargar la página
   useEffect(() => {
@@ -73,12 +93,11 @@ function App() {
 
   useEffect(() => {
     const fetchCurrentUserData = async () => {
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("authToken");
       const savedUser = localStorage.getItem("currentUser");
+      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-      if (!token || !savedUser) {
-        console.log("No se encontró token o usuario en localStorage");
+      if (!isLoggedIn || !savedUser) {
+        console.log("No hay sesión activa");
         return;
       }
 
@@ -95,9 +114,7 @@ function App() {
 
         const res = await fetch(`http://localhost:3001/api/auth/${userId}`, {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include", // Envía cookies automáticamente
         });
 
         if (res.ok) {
@@ -117,16 +134,11 @@ function App() {
   }, []);
 
   // Función para guardar el login en localStorage
-  const saveUserToStorage = (userInfo, isAdminUser = false, token = null) => {
+  const saveUserToStorage = (userInfo, isAdminUser = false) => {
     localStorage.setItem("currentUser", JSON.stringify(userInfo));
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("isAdmin", isAdminUser.toString());
-
-    // Guardar token si existe
-    if (token) {
-      localStorage.setItem("token", token);
-      localStorage.setItem("authToken", token); // Backup del token
-    }
+    // Ya NO guardamos token - se maneja automáticamente con cookies
   };
 
   // Función para limpiar el localStorage (logout)
@@ -134,12 +146,21 @@ function App() {
     localStorage.removeItem("currentUser");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("isAdmin");
-    localStorage.removeItem("token");
-    localStorage.removeItem("authToken");
+    // Ya NO eliminamos tokens - se manejan con cookies en el backend
   };
 
   // Función para cerrar sesión
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      // Llamar al endpoint de logout para limpiar la cookie
+      await fetch("http://localhost:3001/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+
     setCurrentUser(null);
     setIsLoggedIn(false);
     setIsAdmin(false);
@@ -218,6 +239,7 @@ function App() {
 
         const response = await fetch("http://localhost:3001/api/auth/login", {
           method: "POST",
+          credentials: "include", // Envía y recibe cookies automáticamente
           headers: {
             "Content-Type": "application/json",
           },
@@ -233,20 +255,8 @@ function App() {
           setMessage("Inicio de sesión exitoso.");
           setMessageType("success");
 
-          // Intentar diferentes nombres de token que el backend podría usar
-          const possibleToken =
-            data.token ||
-            data.accessToken ||
-            data.authToken ||
-            data.jwt ||
-            data.access_token;
-
-          // Guardar en localStorage (incluyendo token)
-          saveUserToStorage(
-            data.user,
-            data.user.isAdmin || false,
-            possibleToken
-          );
+          // Guardar en localStorage (sin token - se maneja con cookies)
+          saveUserToStorage(data.user, data.user.isAdmin || false);
         } else {
           setMessage(data.message || "Error al iniciar sesion.");
           setMessageType("error");
@@ -418,15 +428,12 @@ function App() {
         <Route
           path="/"
           element={
-            <>
-              <Header />
-              <Main
-                categories={categories}
-                products={products}
-                isFavorite={isFavorite}
-                toggleFavorite={toggleFavorite}
-              />
-            </>
+            <HomePage
+              categories={categories}
+              products={products}
+              isFavorite={isFavorite}
+              toggleFavorite={toggleFavorite}
+            />
           }
         />
         <Route
@@ -434,6 +441,14 @@ function App() {
           element={
             <>
               <ProductsPage items={products} />
+            </>
+          }
+        />
+        <Route
+          path="/products/:id"
+          element={
+            <>
+              <ProductDetailPage />
             </>
           }
         />
@@ -463,7 +478,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/favorites"
           element={
             <ProtectedRoute
@@ -474,8 +489,8 @@ function App() {
               <UserFavoritesPage />
             </ProtectedRoute>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/settings"
           element={
             <ProtectedRoute
@@ -486,7 +501,7 @@ function App() {
               <UserSettingsPage />
             </ProtectedRoute>
           }
-        />
+        /> */}
 
         {/* Rutas de admin protegidas con AdminLayout y AdminNavBar */}
         <Route
@@ -505,12 +520,15 @@ function App() {
           <Route path="products" element={<DashboardProducts />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="users" element={<UsersPage />} />
-          <Route path="analytics" element={<AnalyticsPage />} />
+          {/* <Route path="analytics" element={<AnalyticsPage />} /> */}
           <Route
             path="settings"
             element={<div>Configuración (próximamente)</div>}
           />
         </Route>
+
+        {/* Ruta 404 - Debe estar al final */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
     </div>

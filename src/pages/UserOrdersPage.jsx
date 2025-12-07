@@ -100,54 +100,40 @@ const UserOrdersPage = () => {
 
   const getStatusInfo = (status) => {
     switch (status) {
-      case "pending":
+      case "pendiente":
         return {
           icon: <FiClock />,
           text: "Pendiente",
           color: "#f59e0b",
           bgColor: "#fef3c7",
         };
-      case "processing":
+      case "confirmado":
         return {
           icon: <FiPackage />,
-          text: "Procesando",
+          text: "Confirmado",
           color: "#3b82f6",
           bgColor: "#dbeafe",
         };
-      case "shipping":
+      case "enviado":
         return {
           icon: <FiTruck />,
           text: "Enviado",
           color: "#8b5cf6",
           bgColor: "#e9d5ff",
         };
-      case "shipped":
-        return {
-          icon: <FiTruck />,
-          text: "Enviado",
-          color: "#8b5cf6",
-          bgColor: "#e9d5ff",
-        };
-      case "completed":
+      case "entregado":
         return {
           icon: <FiCheckCircle />,
-          text: "Completado",
+          text: "Entregado",
           color: "#10b981",
           bgColor: "#d1fae5",
         };
-      case "cancelled":
+      case "cancelado":
         return {
           icon: <FiXCircle />,
           text: "Cancelado",
           color: "#ef4444",
           bgColor: "#fee2e2",
-        };
-      case "paid":
-        return {
-          icon: <FiDollarSign />,
-          text: "Pagado",
-          color: "#059669",
-          bgColor: "#d1fae5",
         };
       default:
         return {
@@ -163,10 +149,10 @@ const UserOrdersPage = () => {
     const totalOrders = orders.length;
     const totalSpent = orders.reduce((sum, order) => sum + order.totalPrice, 0);
     const deliveredOrders = orders.filter(
-      (order) => order.status === "completed"
+      (order) => order.status === "entregado"
     ).length;
     const pendingOrders = orders.filter((order) =>
-      ["pending", "processing", "shipped"].includes(order.status)
+      ["pendiente", "confirmado", "enviado"].includes(order.status)
     ).length;
 
     return { totalOrders, totalSpent, deliveredOrders, pendingOrders };
@@ -283,12 +269,11 @@ const UserOrdersPage = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="all">Todos los estados</option>
-              <option value="pending">Pendiente</option>
-              <option value="paid">Pagado</option>
-              <option value="processing">Procesando</option>
-              <option value="shipped">Enviado</option>
-              <option value="completed">Completado</option>
-              <option value="cancelled">Cancelado</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="confirmado">Confirmado</option>
+              <option value="enviado">Enviado</option>
+              <option value="entregado">Entregado</option>
+              <option value="cancelado">Cancelado</option>
             </select>
           </div>
         </div>

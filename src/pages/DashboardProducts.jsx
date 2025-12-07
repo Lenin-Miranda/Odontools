@@ -206,158 +206,287 @@ export default function DashboardProducts() {
         {!loading && products.length > 0 && (
           <>
             {searchTerm.trim() === "" ? (
-              <div className="product__page-table-container">
-                <table className="product__page-table">
-                  <thead className="product__page-table-header">
-                    <tr>
-                      <th>Imagen</th>
-                      <th>Nombre</th>
-                      <th>Categoría</th>
-                      <th>Precio</th>
-                      <th>Stock</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((product) => (
-                      <tr key={product._id} className="product__page-table-row">
-                        <td className="product__page-table-cell">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="product__page-table-img"
-                          />
-                        </td>
-                        {console.log(product)}
-                        <td className="product__page-table-cell">
-                          <span className="product__page-table-name">
+              <>
+                {/* Tabla para desktop */}
+                <div className="product__page-table-container">
+                  <table className="product__page-table">
+                    <thead className="product__page-table-header">
+                      <tr>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map((product) => (
+                        <tr
+                          key={product._id}
+                          className="product__page-table-row"
+                        >
+                          <td className="product__page-table-cell">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="product__page-table-img"
+                            />
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span className="product__page-table-name">
+                              {product.name}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span className="product__page-table-category">
+                              {product.category}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span className="product__page-table-price">
+                              ${product.price.toFixed(2)}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span
+                              className={`product__page-table-stock ${
+                                product.stock < 5 ? "low-stock" : ""
+                              }`}
+                            >
+                              {product.stock}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <div className="product__page-table-actions">
+                              <button
+                                className="product__page-btn product__page-btn-view"
+                                onClick={() => handleViewProduct(product)}
+                              >
+                                Ver
+                              </button>
+                              <button
+                                className="product__page-btn product__page-btn-edit"
+                                onClick={() => handleEditProduct(product)}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                className="product__page-btn product__page-btn-delete"
+                                onClick={() => handleDeleteProduct(product._id)}
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Cards para móvil */}
+                <div className="product__page-cards-container">
+                  {products.map((product) => (
+                    <div key={product._id} className="product__page-card">
+                      <div className="product__page-card-header">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="product__page-card-img"
+                        />
+                        <div className="product__page-card-info">
+                          <div className="product__page-card-name">
                             {product.name}
-                          </span>
-                        </td>
-                        <td className="product__page-table-cell">
-                          <span className="product__page-table-category">
+                          </div>
+                          <div className="product__page-card-category">
                             {product.category}
-                          </span>
-                        </td>
-                        <td className="product__page-table-cell">
-                          <span className="product__page-table-price">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="product__page-card-body">
+                        <div className="product__page-card-price-stock">
+                          <div className="product__page-card-price">
                             ${product.price.toFixed(2)}
-                          </span>
-                        </td>
-                        <td className="product__page-table-cell">
-                          <span
-                            className={`product__page-table-stock ${
+                          </div>
+                          <div
+                            className={`product__page-card-stock ${
                               product.stock < 5 ? "low-stock" : ""
                             }`}
                           >
-                            {product.stock}
-                          </span>
-                        </td>
-                        <td className="product__page-table-cell">
-                          <div className="product__page-table-actions">
-                            <button
-                              className="product__page-btn product__page-btn-view"
-                              onClick={() => handleViewProduct(product)}
-                            >
-                              Ver
-                            </button>
-                            <button
-                              className="product__page-btn product__page-btn-edit"
-                              onClick={() => handleEditProduct(product)}
-                            >
-                              Editar
-                            </button>
-                            <button
-                              className="product__page-btn product__page-btn-delete"
-                              onClick={() => handleDeleteProduct(product._id)}
-                            >
-                              Eliminar
-                            </button>
+                            Stock: {product.stock}
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                        </div>
+                      </div>
+
+                      <div className="product__page-card-actions">
+                        <button
+                          className="product__page-card-btn product__page-card-btn--view"
+                          onClick={() => handleViewProduct(product)}
+                        >
+                          Ver
+                        </button>
+                        <button
+                          className="product__page-card-btn product__page-card-btn--edit"
+                          onClick={() => handleEditProduct(product)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="product__page-card-btn product__page-card-btn--delete"
+                          onClick={() => handleDeleteProduct(product._id)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : filteredProducts.length === 0 ? (
               <p className="product__page-no-results">
                 No se encontraron productos.
               </p>
             ) : (
-              <div className="product__page-table-container">
-                <table className="product__page-table">
-                  <thead className="product__page-table-header">
-                    <tr>
-                      <th>Imagen</th>
-                      <th>Nombre</th>
-                      <th>Categoría</th>
-                      <th>Precio</th>
-                      <th>Stock</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredProducts.map((product) => (
-                      <tr key={product._id} className="product__page-table-row">
-                        <td className="product__page-table-cell">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="product__page-table-img"
-                          />
-                        </td>
-                        <td className="product__page-table-cell">
-                          <span className="product__page-table-name">
+              <>
+                {/* Tabla de resultados filtrados para desktop */}
+                <div className="product__page-table-container">
+                  <table className="product__page-table">
+                    <thead className="product__page-table-header">
+                      <tr>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredProducts.map((product) => (
+                        <tr
+                          key={product._id}
+                          className="product__page-table-row"
+                        >
+                          <td className="product__page-table-cell">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="product__page-table-img"
+                            />
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span className="product__page-table-name">
+                              {product.name}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span className="product__page-table-category">
+                              {product.category}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span className="product__page-table-price">
+                              ${product.price.toFixed(2)}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span
+                              className={`product__page-table-stock ${
+                                product.stock < 5 ? "low-stock" : ""
+                              }`}
+                            >
+                              {product.stock}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <div className="product__page-table-actions">
+                              <button
+                                className="product__page-btn product__page-btn-view"
+                                onClick={() => handleViewProduct(product)}
+                              >
+                                Ver
+                              </button>
+                              <button
+                                className="product__page-btn product__page-btn-edit"
+                                onClick={() => handleEditProduct(product)}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                className="product__page-btn product__page-btn-delete"
+                                onClick={() => handleDeleteProduct(product._id)}
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Cards de resultados filtrados para móvil */}
+                <div className="product__page-cards-container">
+                  {filteredProducts.map((product) => (
+                    <div key={product._id} className="product__page-card">
+                      <div className="product__page-card-header">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="product__page-card-img"
+                        />
+                        <div className="product__page-card-info">
+                          <div className="product__page-card-name">
                             {product.name}
-                          </span>
-                        </td>
-                        <td className="product__page-table-cell">
-                          <span className="product__page-table-category">
+                          </div>
+                          <div className="product__page-card-category">
                             {product.category}
-                          </span>
-                        </td>
-                        <td className="product__page-table-cell">
-                          <span className="product__page-table-price">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="product__page-card-body">
+                        <div className="product__page-card-price-stock">
+                          <div className="product__page-card-price">
                             ${product.price.toFixed(2)}
-                          </span>
-                        </td>
-                        <td className="product__page-table-cell">
-                          <span
-                            className={`product__page-table-stock ${
+                          </div>
+                          <div
+                            className={`product__page-card-stock ${
                               product.stock < 5 ? "low-stock" : ""
                             }`}
                           >
-                            {product.stock}
-                          </span>
-                        </td>
-                        <td className="product__page-table-cell">
-                          <div className="product__page-table-actions">
-                            <button
-                              className="product__page-btn product__page-btn-view"
-                              onClick={() => handleViewProduct(product)}
-                            >
-                              Ver
-                            </button>
-                            <button
-                              className="product__page-btn product__page-btn-edit"
-                              onClick={() => handleEditProduct(product)}
-                            >
-                              Editar
-                            </button>
-                            <button
-                              className="product__page-btn product__page-btn-delete"
-                              onClick={() => handleDeleteProduct(product._id)}
-                            >
-                              Eliminar
-                            </button>
+                            Stock: {product.stock}
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                        </div>
+                      </div>
+
+                      <div className="product__page-card-actions">
+                        <button
+                          className="product__page-card-btn product__page-card-btn--view"
+                          onClick={() => handleViewProduct(product)}
+                        >
+                          Ver
+                        </button>
+                        <button
+                          className="product__page-card-btn product__page-card-btn--edit"
+                          onClick={() => handleEditProduct(product)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="product__page-card-btn product__page-card-btn--delete"
+                          onClick={() => handleDeleteProduct(product._id)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </>
         )}
