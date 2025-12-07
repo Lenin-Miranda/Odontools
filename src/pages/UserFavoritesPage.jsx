@@ -9,6 +9,8 @@ import {
   FiFilter,
   FiArrowLeft,
 } from "react-icons/fi";
+import ConfirmModal from "../components/ConfirmModal/ConfirmModal";
+import useConfirm from "../hooks/useConfirm";
 import "./UserFavoritesPage.css";
 
 const UserFavoritesPage = () => {
@@ -18,6 +20,7 @@ const UserFavoritesPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [sortBy, setSortBy] = useState("name");
+  const { confirmState, showConfirm, closeConfirm } = useConfirm();
 
   // Simulación de productos favoritos (en producción vendría de una API)
   useEffect(() => {
@@ -112,13 +115,16 @@ const UserFavoritesPage = () => {
   };
 
   const clearAllFavorites = () => {
-    if (
-      window.confirm(
-        "¿Estás seguro de que quieres eliminar todos los favoritos?"
-      )
-    ) {
-      setFavorites([]);
-    }
+    showConfirm({
+      title: "Limpiar favoritos",
+      message: "¿Estás seguro de que quieres eliminar todos los favoritos?",
+      confirmText: "Eliminar todos",
+      cancelText: "Cancelar",
+      type: "danger",
+      onConfirm: () => {
+        setFavorites([]);
+      },
+    });
   };
 
   const categories = [
@@ -294,6 +300,19 @@ const UserFavoritesPage = () => {
           </>
         )}
       </div>
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText={confirmState.confirmText}
+        cancelText={confirmState.cancelText}
+        type={confirmState.type}
+        showCancel={confirmState.showCancel}
+      />
     </div>
   );
 };

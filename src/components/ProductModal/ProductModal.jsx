@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { AiOutlineClose, AiOutlineUpload } from "react-icons/ai";
 import { FiImage } from "react-icons/fi";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
+import useConfirm from "../../hooks/useConfirm";
 import "./ProductModal.css";
 
 export default function ProductModal({
@@ -10,6 +12,7 @@ export default function ProductModal({
   product = null,
   isLoading = false,
   mode = "create", // "create", "edit", "view"
+  onDeleteImage = null, // Función para eliminar imágenes
 }) {
   const [formData, setFormData] = useState({
     name: mode === "edit" || mode === "view" ? product?.name || "" : "",
@@ -37,6 +40,7 @@ export default function ProductModal({
   const [dragActiveGallery, setDragActiveGallery] = useState(false);
   const fileInputRef = useRef(null);
   const galleryInputRef = useRef(null);
+  const { confirmState, showConfirm, showAlert, closeConfirm } = useConfirm();
 
   // Actualizar el formulario cuando cambie el producto o el modo
   useEffect(() => {
@@ -190,6 +194,39 @@ export default function ProductModal({
       images: prev.images.filter((_, i) => i !== index),
     }));
     setAdditionalPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Eliminar imagen existente del servidor (para modo edit)
+  const handleDeleteExistingImage = async (imageUrl) => {
+    if (!onDeleteImage || !product || !product._id) {
+      console.error("No se puede eliminar: falta onDeleteImage o product ID");
+      return;
+    }
+
+    showConfirm({
+      title: "Eliminar imagen",
+      message: "¿Estás seguro de eliminar esta imagen de la galería?",
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+      type: "danger",
+      onConfirm: async () => {
+        const result = await onDeleteImage(product._id, imageUrl);
+        if (result.success) {
+          // Actualizar las previews locales removiendo la imagen eliminada
+          setAdditionalPreviews((prev) =>
+            prev.filter((img) => img !== imageUrl)
+          );
+          console.log("✅ Imagen eliminada del servidor");
+        } else {
+          console.error("❌ Error al eliminar imagen:", result.error);
+          showAlert({
+            title: "Error",
+            message: "Error al eliminar la imagen: " + result.error,
+            type: "danger",
+          });
+        }
+      },
+    });
   };
 
   const handleSubmit = (e) => {
@@ -386,7 +423,16 @@ export default function ProductModal({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            removeGalleryImage(index);
+                            // Si es una URL (imagen existente), eliminar del servidor
+                            if (
+                              typeof preview === "string" &&
+                              preview.startsWith("http")
+                            ) {
+                              handleDeleteExistingImage(preview);
+                            } else {
+                              // Si es una imagen nueva (no subida aún), solo remover localmente
+                              removeGalleryImage(index);
+                            }
                           }}
                           style={{
                             position: "absolute",
@@ -641,6 +687,19 @@ export default function ProductModal({
           </div>
         </form>
       </div>
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText={confirmState.confirmText}
+        cancelText={confirmState.cancelText}
+        type={confirmState.type}
+        showCancel={confirmState.showCancel}
+      />
     </div>
   );
 }

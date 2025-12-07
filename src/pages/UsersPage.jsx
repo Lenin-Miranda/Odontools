@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useUsers } from "../hooks/useUsers";
 import UserEditModal from "../components/UserEditModal/UserEditModal";
+import ConfirmModal from "../components/ConfirmModal/ConfirmModal";
+import useConfirm from "../hooks/useConfirm";
 import {
   FiSearch,
   FiFilter,
@@ -14,7 +16,7 @@ import {
 } from "react-icons/fi";
 import "./UsersPage.css";
 
-const UsersPage = () => {
+const UsersPage = ({ currentUser }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedUser, setSelectedUser] = useState(null);
@@ -24,6 +26,7 @@ const UsersPage = () => {
   const [modalMode, setModalMode] = useState("edit");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const { confirmState, showConfirm, closeConfirm } = useConfirm();
 
   // Hook para manejar usuarios
   const { users, loading, error, fetchUsers, updateUser, deleteUser } =
@@ -89,26 +92,44 @@ const UsersPage = () => {
   };
 
   const handleDeleteUser = async (user) => {
-    const userId = user._id || user.id;
+    const userId = String(user._id || user.id);
     const userName = user.name;
+    const currentUserId = String(currentUser?._id || currentUser?.id);
 
-    if (
-      window.confirm(
-        `¿Estás seguro de que quieres eliminar al usuario "${userName}"?`
-      )
-    ) {
-      const result = await deleteUser(userId);
+    console.log("🔍 Comparando IDs:", {
+      userId,
+      currentUserId,
+      match: userId === currentUserId,
+    });
 
-      if (result.success) {
-        setMessage("Usuario eliminado exitosamente");
-        setMessageType("success");
-        setTimeout(() => setMessage(""), 3000);
-      } else {
-        setMessage(result.error || "Error al eliminar el usuario");
-        setMessageType("error");
-        setTimeout(() => setMessage(""), 5000);
-      }
+    // Prevenir eliminación del usuario actual
+    if (userId === currentUserId) {
+      setMessage("No puedes eliminar tu propia cuenta mientras estás logueado");
+      setMessageType("error");
+      setTimeout(() => setMessage(""), 3000);
+      return;
     }
+
+    showConfirm({
+      title: "Eliminar usuario",
+      message: `¿Estás seguro de que quieres eliminar al usuario "${userName}"? Esta acción no se puede deshacer.`,
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+      type: "danger",
+      onConfirm: async () => {
+        const result = await deleteUser(userId);
+
+        if (result.success) {
+          setMessage("Usuario eliminado exitosamente");
+          setMessageType("success");
+          setTimeout(() => setMessage(""), 3000);
+        } else {
+          setMessage(result.error || "Error al eliminar el usuario");
+          setMessageType("error");
+          setTimeout(() => setMessage(""), 5000);
+        }
+      },
+    });
   };
 
   const closeEditModal = () => {
@@ -250,7 +271,13 @@ const UsersPage = () => {
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="user-info__details">
-                      <div className="user-info__name">{user.name}</div>
+                      <div className="user-info__name">
+                        {user.name}
+                        {String(user._id || user.id) ===
+                          String(currentUser?._id || currentUser?.id) && (
+                          <span className="current-user-badge"> (Tú)</span>
+                        )}
+                      </div>
                       <div className="user-info__role">
                         {user.isAdmin ? "Administrador" : "Cliente"}
                       </div>
@@ -296,6 +323,22 @@ const UsersPage = () => {
                   <button
                     className="delete-btn"
                     onClick={() => handleDeleteUser(user)}
+                    disabled={
+                      String(user._id || user.id) ===
+                      String(currentUser?._id || currentUser?.id)
+                    }
+                    style={{
+                      opacity:
+                        String(user._id || user.id) ===
+                        String(currentUser?._id || currentUser?.id)
+                          ? 0.5
+                          : 1,
+                      cursor:
+                        String(user._id || user.id) ===
+                        String(currentUser?._id || currentUser?.id)
+                          ? "not-allowed"
+                          : "pointer",
+                    }}
                   >
                     Eliminar
                   </button>
@@ -323,7 +366,13 @@ const UsersPage = () => {
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div className="user-card__header-info">
-                <h3 className="user-card__name">{user.name}</h3>
+                <h3 className="user-card__name">
+                  {user.name}
+                  {String(user._id || user.id) ===
+                    String(currentUser?._id || currentUser?.id) && (
+                    <span className="current-user-badge"> (Tú)</span>
+                  )}
+                </h3>
                 <span className="user-card__role">
                   {user.isAdmin ? "Administrador" : "Cliente"}
                 </span>
@@ -392,6 +441,22 @@ const UsersPage = () => {
               <button
                 className="user-card__btn user-card__btn--delete"
                 onClick={() => handleDeleteUser(user)}
+                disabled={
+                  String(user._id || user.id) ===
+                  String(currentUser?._id || currentUser?.id)
+                }
+                style={{
+                  opacity:
+                    String(user._id || user.id) ===
+                    String(currentUser?._id || currentUser?.id)
+                      ? 0.5
+                      : 1,
+                  cursor:
+                    String(user._id || user.id) ===
+                    String(currentUser?._id || currentUser?.id)
+                      ? "not-allowed"
+                      : "pointer",
+                }}
               >
                 <FiTrash2 /> Eliminar
               </button>
@@ -530,6 +595,19 @@ const UsersPage = () => {
           isLoading={loading}
         />
       )}
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText={confirmState.confirmText}
+        cancelText={confirmState.cancelText}
+        type={confirmState.type}
+        showCancel={confirmState.showCancel}
+      />
     </div>
   );
 };

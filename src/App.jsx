@@ -6,7 +6,7 @@ import Footer from "./components/Footer/Footer";
 import "./App.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { products } from "./data/productsData";
+import { products as fallbackProducts } from "./data/productsData";
 import { categories } from "./data/categoriesData";
 import { Route, Routes } from "react-router";
 import ProductsPage from "./pages/ProductsPage";
@@ -31,6 +31,7 @@ import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import HomePage from "./components/HomePage/HomePage";
+import { useProducts } from "./hooks/useProducts";
 
 function App() {
   // Estados principales
@@ -52,6 +53,16 @@ function App() {
     isAdmin: false,
   });
   const [isUserOpen, setIsUserOpen] = useState(false);
+
+  // Hook para productos desde la API
+  const {
+    products: apiProducts,
+    fetchProducts,
+    loading: productsLoading,
+  } = useProducts();
+
+  // Estado para productos (usa API o fallback)
+  const [products, setProducts] = useState([]);
 
   // useEffect para inicializar AOS
   useEffect(() => {
@@ -131,6 +142,33 @@ function App() {
     };
 
     fetchCurrentUserData();
+  }, []);
+
+  // useEffect para cargar productos desde la API
+  useEffect(() => {
+    const loadProducts = async () => {
+      console.log("🔄 Cargando productos desde la API...");
+      const result = await fetchProducts();
+
+      if (
+        result.success &&
+        result.data.products &&
+        result.data.products.length > 0
+      ) {
+        console.log(
+          "✅ Productos cargados desde la API:",
+          result.data.products.length
+        );
+        setProducts(result.data.products);
+      } else {
+        console.log(
+          "⚠️ No se pudieron cargar productos desde la API, usando datos estáticos"
+        );
+        setProducts(fallbackProducts);
+      }
+    };
+
+    loadProducts();
   }, []);
 
   // Función para guardar el login en localStorage
@@ -519,7 +557,10 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<DashboardProducts />} />
           <Route path="orders" element={<OrdersPage />} />
-          <Route path="users" element={<UsersPage />} />
+          <Route
+            path="users"
+            element={<UsersPage currentUser={currentUser} />}
+          />
           {/* <Route path="analytics" element={<AnalyticsPage />} /> */}
           <Route
             path="settings"

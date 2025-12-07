@@ -260,7 +260,7 @@ export const useProducts = () => {
       console.log(`🗑️ Eliminando imagen del producto ${productId}:`, imageUrl);
 
       const response = await fetch(
-        `http://localhost:3001/api/products/${productId}/image`,
+        `http://localhost:3001/api/products/${productId}/images`,
         {
           method: "DELETE",
           credentials: "include",

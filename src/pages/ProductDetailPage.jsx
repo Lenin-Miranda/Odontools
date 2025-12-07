@@ -153,17 +153,17 @@ const ProductDetailPage = () => {
               <div className="gallery__thumbnails">
                 {allImages.map((img, index) => (
                   <div
-                    key={index}
+                    key={`thumbnail-${index}-${img}`}
                     className={`gallery__thumbnail ${
                       selectedImageIndex === index ? "active" : ""
                     }`}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
+                      console.log(`🖼️ Cambiando a imagen ${index}`);
                       setSelectedImageIndex(index);
                     }}
-                    data-aos="zoom-in"
-                    data-aos-delay={index * 50}
+                    style={{ cursor: "pointer" }}
                   >
                     <img
                       src={img}

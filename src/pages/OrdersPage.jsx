@@ -13,6 +13,8 @@ import {
   FiPackage,
 } from "react-icons/fi";
 import { useSales } from "../hooks/useSales";
+import ConfirmModal from "../components/ConfirmModal/ConfirmModal";
+import useConfirm from "../hooks/useConfirm";
 import "./OrdersPage.css";
 
 export default function OrdersPage() {
@@ -28,6 +30,7 @@ export default function OrdersPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const { confirmState, showConfirm, showAlert, closeConfirm } = useConfirm();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditingStatus, setIsEditingStatus] = useState(false);
@@ -72,36 +75,55 @@ export default function OrdersPage() {
       setIsEditingStatus(false);
       fetchSales(); // Recargar ventas
     } else {
-      alert("Error al actualizar el estado: " + result.error);
+      showAlert({
+        title: "Error",
+        message: "Error al actualizar el estado: " + result.error,
+        type: "danger",
+      });
     }
   };
 
   const handleConfirmSale = async () => {
     if (!selectedOrder) return;
 
-    const confirmed = window.confirm(
-      `¿Confirmar el pago del pedido #${selectedOrder._id
+    showConfirm({
+      title: "Confirmar pago",
+      message: `¿Confirmar el pago del pedido #${selectedOrder._id
         .slice(-8)
-        .toUpperCase()}?\n\nEsto descontará el stock de los productos.`
-    );
+        .toUpperCase()}?\n\nEsto descontará el stock de los productos.`,
+      confirmText: "Confirmar pago",
+      cancelText: "Cancelar",
+      type: "warning",
+      onConfirm: async () => {
+        const result = await confirmSale(selectedOrder._id);
 
-    if (!confirmed) return;
-
-    const result = await confirmSale(selectedOrder._id);
-
-    if (result.success) {
-      setSelectedOrder({ ...selectedOrder, status: "paid" });
-      alert("✅ Pago confirmado y stock descontado exitosamente");
-      fetchSales(); // Recargar ventas
-    } else {
-      alert("❌ Error al confirmar el pago: " + result.error);
-    }
+        if (result.success) {
+          setSelectedOrder({ ...selectedOrder, status: "paid" });
+          showAlert({
+            title: "Éxito",
+            message: "Pago confirmado y stock descontado exitosamente",
+            type: "success",
+          });
+          fetchSales(); // Recargar ventas
+        } else {
+          showAlert({
+            title: "Error",
+            message: "Error al confirmar el pago: " + result.error,
+            type: "danger",
+          });
+        }
+      },
+    });
   };
 
   const handleExportOrders = async () => {
     const result = await exportSalesToCSV();
     if (!result.success) {
-      alert("Error al exportar: " + result.error);
+      showAlert({
+        title: "Error",
+        message: "Error al exportar: " + result.error,
+        type: "danger",
+      });
     }
   };
 
@@ -622,6 +644,19 @@ export default function OrdersPage() {
           </div>
         </div>
       )}
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText={confirmState.confirmText}
+        cancelText={confirmState.cancelText}
+        type={confirmState.type}
+        showCancel={confirmState.showCancel}
+      />
     </div>
   );
 }

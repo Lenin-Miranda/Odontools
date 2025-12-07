@@ -14,7 +14,7 @@ export default function Main({
   return (
     <main className="main">
       <Categories categories={categories} products={products} />
-      <Products isFavorite={isFavorite} toggleFavorite={toggleFavorite} />
+      <Products products={products} isFavorite={isFavorite} toggleFavorite={toggleFavorite} />
       <About />
       <Contact />
     </main>
