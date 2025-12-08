@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getApiUrl } from "../config/api";
 import {
   FiUser,
   FiMail,
@@ -66,7 +67,7 @@ const UserProfilePage = () => {
     setLoading(true);
     try {
       // Simular llamada a API
-      const response = await fetch(`http://localhost:3001/api/auth/profile`, {
+      const response = await fetch(getApiUrl(`/api/auth/profile`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

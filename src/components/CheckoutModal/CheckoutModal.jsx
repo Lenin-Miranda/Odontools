@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../../hooks/UseCart";
 import { useSales } from "../../hooks/useSales";
+import { getApiUrl } from "../../config/api";
 import { IoClose } from "react-icons/io5";
 import "./CheckoutModal.css";
 
 export default function CheckoutModal({ isOpen, onClose, userInfo }) {
   const { cart, cartTotal, clearCart } = useCart();
   const { createSale, loading } = useSales();
-  console.log("User Info in CheckoutModal:", userInfo);
 
   const [formData, setFormData] = useState({
     paymentMethod: "cash",
@@ -83,7 +83,7 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
       // Actualizar el perfil del usuario si el teléfono es nuevo o diferente
       if (formData.phone && formData.phone !== userInfo?.phone) {
         try {
-          await fetch(`http://localhost:3001/api/auth/${userInfo._id}`, {
+          await fetch(getApiUrl(`/api/auth/${userInfo._id}`), {
             method: "PUT",
             credentials: "include", // Envía cookies automáticamente
             headers: {
@@ -97,11 +97,14 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
       }
 
       // Crear la venta
+      const shippingCost = cartTotal > 100 ? 0 : 10;
+
       const salePayload = {
         paymentMethod: formData.paymentMethod,
         shippingAddress: formData.shippingAddress,
         email: formData.email,
         phone: formData.phone,
+        shippingCost: shippingCost, // ✅ Agregar el costo de envío
       };
 
       // Agregar datos bancarios si es transferencia
@@ -130,9 +133,9 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
   const resetForm = () => {
     setFormData({
       paymentMethod: "cash",
-      email: userInfo?.email || "",
-      shippingAddress: userInfo?.address || "",
-      phone: userInfo?.phone || "",
+      email: "",
+      shippingAddress: "",
+      phone: "",
       bankAccountName: "",
       bankAccountNumber: "",
     });

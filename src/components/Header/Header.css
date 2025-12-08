@@ -2,11 +2,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 180px 20px; /* Este padding es muy grande */
+  min-height: 100vh;
+  padding: 100px 20px;
   background-color: rgba(131, 152, 255, 0.105);
   width: 100%;
-  box-sizing: border-box; /* Agregar esto */
-  overflow: hidden; /* Agregar esto para prevenir desbordamiento */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .header__hero {
@@ -87,7 +88,8 @@
 @media (max-width: 760px) {
   .header {
     flex-direction: column;
-    padding: 100px 20px 40px;
+    min-height: 100vh;
+    padding: 80px 20px 40px;
     gap: 40px;
   }
 

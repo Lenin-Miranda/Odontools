@@ -1,10 +1,10 @@
 import "./ProductsPage.css";
 import search from "../assets/search.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaCheck } from "react-icons/fa";
 import ProductsCard from "../components/ProductsCard/ProductsCard";
-import { useEffect } from "react";
 import { useProducts } from "../hooks/useProducts.js";
 import {
   sortByPriceAsc,
@@ -20,6 +20,7 @@ import {
 } from "../utils/filterTypes/filterTypes.js";
 
 export default function ProductsPage({ items }) {
+  const [searchParams] = useSearchParams();
   // ✅ Hook llamado DENTRO del componente
   const {
     fetchProducts,
@@ -31,6 +32,7 @@ export default function ProductsPage({ items }) {
   const [openMenu, setOpenMenu] = useState(null);
   const [sortOption, setSortOption] = useState("Nombre A-Z");
   const [filterOption, setFilterOption] = useState("Todas");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [message, setMessage] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +55,14 @@ export default function ProductsPage({ items }) {
     fetchProducts();
   }, []);
 
+  // Leer parámetro de categoría de la URL
+  useEffect(() => {
+    const category = searchParams.get("category");
+    if (category) {
+      setCategoryFilter(category);
+    }
+  }, [searchParams]);
+
   // Sincronizar productos del hook con estado local
   useEffect(() => {
     if (hookProducts.length > 0) {
@@ -72,6 +82,15 @@ export default function ProductsPage({ items }) {
 
   const getFilteredAndSortedProducts = () => {
     let filtered = searchFunction();
+
+    // Filtrar por categoría si hay una seleccionada
+    if (categoryFilter) {
+      filtered = filtered.filter(
+        (product) =>
+          product.category === categoryFilter ||
+          product.categorie === categoryFilter
+      );
+    }
 
     if (filterOption === "En stock") filtered = filterInStock(filtered);
     else if (filterOption === "En oferta") filtered = filterOnSale(filtered);
@@ -103,6 +122,42 @@ export default function ProductsPage({ items }) {
             Explora nuestra amplia gama de equipos y suministros dentales
             profesionales
           </p>
+          {categoryFilter && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                marginTop: "15px",
+                padding: "10px 15px",
+                backgroundColor: "#667eea",
+                color: "white",
+                borderRadius: "8px",
+                fontSize: "0.95rem",
+                fontWeight: "500",
+              }}
+            >
+              <span>Filtrando por: {categoryFilter}</span>
+              <button
+                onClick={() => {
+                  setCategoryFilter("");
+                  window.history.pushState({}, "", "/products");
+                }}
+                style={{
+                  background: "rgba(255, 255, 255, 0.2)",
+                  border: "none",
+                  color: "white",
+                  padding: "5px 12px",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                  fontWeight: "600",
+                }}
+              >
+                ✕ Limpiar
+              </button>
+            </div>
+          )}
         </div>
         <div className="products__searchbar-elements">
           <label

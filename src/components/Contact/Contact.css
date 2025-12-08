@@ -4,7 +4,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 40px;
+  min-height: 100vh;
+  padding: 80px 40px;
   text-align: center;
 }
 
@@ -69,4 +70,19 @@
   font-size: 16px;
   font-weight: 500;
   color: #555;
+}
+
+@media (max-width: 760px) {
+  .contact {
+    min-height: auto;
+    padding: 60px 20px;
+  }
+
+  .contact__container-title {
+    font-size: 28px;
+  }
+
+  .contact__container-description {
+    font-size: 16px;
+  }
 }

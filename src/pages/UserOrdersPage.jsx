@@ -26,6 +26,7 @@ const UserOrdersPage = () => {
     getSalesByUser,
     getSaleById,
     exportUserSalesToCSV,
+    exportSale,
   } = useSales();
 
   const [user, setUser] = useState(null);
@@ -178,6 +179,14 @@ const UserOrdersPage = () => {
     const result = await exportUserSalesToCSV();
     if (!result.success) {
       alert("Error al exportar: " + result.error);
+    }
+  };
+
+  // Descargar factura individual
+  const handleDownloadInvoice = async (orderId) => {
+    const result = await exportSale(orderId);
+    if (!result.success) {
+      alert("Error al descargar factura: " + result.error);
     }
   };
 
@@ -444,10 +453,63 @@ const UserOrdersPage = () => {
                       </div>
                     ))}
                   </div>
-                  <div className="order-total-detail">
-                    <strong>
-                      Total: ${selectedOrder.totalPrice.toFixed(2)}
-                    </strong>
+                  <div
+                    className="order-total-detail"
+                    style={{
+                      borderTop: "2px solid #e5e7eb",
+                      paddingTop: "1rem",
+                      marginTop: "1rem",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "0.5rem",
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      <span>Subtotal:</span>
+                      <span>
+                        $
+                        {(
+                          selectedOrder.totalPrice -
+                          (selectedOrder.shippingCost || 0)
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "0.5rem",
+                        fontSize: "0.95rem",
+                        color:
+                          selectedOrder.shippingCost > 0
+                            ? "#ef4444"
+                            : "#10b981",
+                      }}
+                    >
+                      <span>Envío:</span>
+                      <span>
+                        {selectedOrder.shippingCost > 0
+                          ? `$${selectedOrder.shippingCost.toFixed(2)}`
+                          : "Gratis 🎉"}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        paddingTop: "0.5rem",
+                        borderTop: "2px solid #3b82f6",
+                      }}
+                    >
+                      <strong style={{ fontSize: "1.1rem" }}>Total:</strong>
+                      <strong style={{ fontSize: "1.1rem", color: "#3b82f6" }}>
+                        ${selectedOrder.totalPrice.toFixed(2)}
+                      </strong>
+                    </div>
                   </div>
                 </div>
 
@@ -464,9 +526,13 @@ const UserOrdersPage = () => {
                 >
                   Cerrar
                 </button>
-                <button className="btn btn--primary">
+                <button
+                  className="btn btn--primary"
+                  onClick={() => handleDownloadInvoice(selectedOrder._id)}
+                  disabled={loading}
+                >
                   <FiDownload />
-                  Descargar Factura
+                  {loading ? "Descargando..." : "Descargar Factura"}
                 </button>
               </div>
             </div>

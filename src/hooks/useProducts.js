@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiUrl } from "../config/api";
 
 export const useProducts = () => {
   const [products, setProducts] = useState([]);
@@ -11,22 +12,19 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      console.log("📤 Enviando producto al backend...");
 
       // Verificar si hay imagen en FormData
       const hasImage =
         formData.has("image") && formData.get("image") instanceof File;
 
       if (hasImage) {
-        console.log("🖼️ Imagen detectada, enviando como FormData");
         // Enviar FormData directamente (multer lo procesará)
         // NO establecer Content-Type, el navegador lo hace automáticamente con boundary
       } else {
-        console.log("📝 Sin imagen, enviando como FormData normal");
         // Aunque no haya imagen, enviamos como FormData para consistencia
       }
 
-      const response = await fetch("http://localhost:3001/api/products", {
+      const response = await fetch(getApiUrl("/api/products"), {
         method: "POST",
         credentials: "include", // Envía cookies automáticamente
         body: formData, // Enviar FormData directamente
@@ -39,7 +37,6 @@ export const useProducts = () => {
       }
 
       const result = await response.json();
-      console.log("✅ Producto creado exitosamente:", result);
 
       // Actualizar lista local de productos
       setProducts((prev) => [...prev, result.product]);
@@ -65,20 +62,16 @@ export const useProducts = () => {
         throw new Error("ID de producto inválido para actualización");
       }
 
-      console.log(`📝 Actualizando producto con ID: ${id}`);
-      console.log(`📤 Actualizando producto ${id}...`);
 
       // Verificar si hay imagen nueva
       const hasImage =
         formData.has("image") && formData.get("image") instanceof File;
 
       if (hasImage) {
-        console.log("🖼️ Nueva imagen detectada para actualización");
       } else {
-        console.log("📝 Actualizando sin cambiar imagen");
       }
 
-      const response = await fetch(`http://localhost:3001/api/products/${id}`, {
+      const response = await fetch(getApiUrl(`/api/products/${id}`), {
         method: "PUT",
         credentials: "include", // Envía cookies automáticamente
         body: formData, // Enviar FormData directamente
@@ -91,7 +84,6 @@ export const useProducts = () => {
       }
 
       const result = await response.json();
-      console.log("✅ Producto actualizado exitosamente:", result);
 
       // Actualizar lista local de productos (usar _id de MongoDB)
       setProducts((prev) =>
@@ -121,9 +113,8 @@ export const useProducts = () => {
         throw new Error("ID de producto inválido");
       }
 
-      console.log(`🗑️ Eliminando producto con ID: ${id}`);
 
-      const response = await fetch(`http://localhost:3001/api/products/${id}`, {
+      const response = await fetch(getApiUrl(`/api/products/${id}`), {
         method: "DELETE",
         credentials: "include", // Envía cookies automáticamente
       });
@@ -158,9 +149,8 @@ export const useProducts = () => {
         throw new Error("ID de producto inválido para consulta");
       }
 
-      console.log(`🔍 Obteniendo producto con ID: ${id}`);
 
-      const response = await fetch(`http://localhost:3001/api/products/${id}`, {
+      const response = await fetch(getApiUrl(`/api/products/${id}`), {
         credentials: "include", // Envía cookies automáticamente
       });
 
@@ -169,7 +159,6 @@ export const useProducts = () => {
       }
 
       const result = await response.json();
-      console.log("📦 Producto obtenido:", result);
 
       return { success: true, data: result };
     } catch (err) {
@@ -187,7 +176,7 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/products", {
+      const response = await fetch(getApiUrl("/api/products"), {
         credentials: "include", // Envía cookies automáticamente
       });
 
@@ -196,7 +185,6 @@ export const useProducts = () => {
       }
 
       const result = await response.json();
-      console.log("📦 Productos obtenidos:", result);
 
       // Tu backend devuelve { success: true, products: [...] }
       setProducts(result.products || []);
@@ -257,10 +245,9 @@ export const useProducts = () => {
         throw new Error("URL de imagen requerida");
       }
 
-      console.log(`🗑️ Eliminando imagen del producto ${productId}:`, imageUrl);
 
       const response = await fetch(
-        `http://localhost:3001/api/products/${productId}/image`,
+        getApiUrl(`/api/products/${productId}/images`),
         {
           method: "DELETE",
           credentials: "include",
@@ -279,7 +266,6 @@ export const useProducts = () => {
       }
 
       const result = await response.json();
-      console.log("✅ Imagen eliminada exitosamente");
 
       // Actualizar el producto en la lista local
       setProducts((prev) =>

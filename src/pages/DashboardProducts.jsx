@@ -2,7 +2,9 @@ import { FiBox, FiPlus } from "react-icons/fi";
 
 import { useState, useEffect } from "react";
 import ProductModal from "../components/ProductModal/ProductModal";
+import ConfirmModal from "../components/ConfirmModal/ConfirmModal";
 import { useProducts } from "../hooks/useProducts";
+import useConfirm from "../hooks/useConfirm";
 import "./DashboardProducts.css";
 
 export default function DashboardProducts() {
@@ -12,6 +14,7 @@ export default function DashboardProducts() {
   const [messageType, setMessageType] = useState("");
   const [editingProduct, setEditingProduct] = useState(null);
   const [modalMode, setModalMode] = useState("create"); // "create", "edit", "view"
+  const { confirmState, showConfirm, closeConfirm } = useConfirm();
 
   // Hook personalizado para manejar productos
   const {
@@ -22,6 +25,7 @@ export default function DashboardProducts() {
     updateProduct,
     deleteProduct,
     fetchProducts,
+    deleteProductImage,
   } = useProducts();
 
   // useEffect para cargar productos al montar el componente
@@ -104,26 +108,32 @@ export default function DashboardProducts() {
   };
 
   const handleDeleteProduct = async (productId) => {
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar este producto?")
-    ) {
-      const result = await deleteProduct(productId);
+    showConfirm({
+      title: "Eliminar producto",
+      message:
+        "¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.",
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+      type: "danger",
+      onConfirm: async () => {
+        const result = await deleteProduct(productId);
 
-      if (result.success) {
-        setMessage("Producto eliminado exitosamente");
-        setMessageType("success");
+        if (result.success) {
+          setMessage("Producto eliminado exitosamente");
+          setMessageType("success");
 
-        // Refrescar la lista de productos
-        await fetchProducts();
+          // Refrescar la lista de productos
+          await fetchProducts();
 
-        setTimeout(() => setMessage(""), 3000);
-      } else {
-        setMessage(result.error || "Error al eliminar el producto");
-        setMessageType("error");
+          setTimeout(() => setMessage(""), 3000);
+        } else {
+          setMessage(result.error || "Error al eliminar el producto");
+          setMessageType("error");
 
-        setTimeout(() => setMessage(""), 5000);
-      }
-    }
+          setTimeout(() => setMessage(""), 5000);
+        }
+      },
+    });
   };
 
   const handleCloseModal = () => {
@@ -502,6 +512,20 @@ export default function DashboardProducts() {
         product={editingProduct}
         isLoading={loading}
         mode={modalMode}
+        onDeleteImage={deleteProductImage}
+      />
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText={confirmState.confirmText}
+        cancelText={confirmState.cancelText}
+        type={confirmState.type}
+        showCancel={confirmState.showCancel}
       />
     </div>
   );

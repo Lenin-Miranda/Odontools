@@ -36,8 +36,8 @@ export default function ProductsCard({ products, isFeatured = false }) {
           >
             Agotado
           </span>
-        ) : product.discount ? (
-          <span className="products__list-offer">Oferta</span>
+        ) : product.discount > 0 ? (
+          <span className="products__list-offer">-{product.discount}%</span>
         ) : null}
         <div
           className="products__list-clickable"
@@ -64,13 +64,14 @@ export default function ProductsCard({ products, isFeatured = false }) {
             </p>
             <div className="products__list-reviews"></div>
             <div className="products__list-price-container">
-              {product.discount ? (
+              {product.discount > 0 ? (
                 <>
                   <p className="products__list-price">
                     $
-                    {parseFloat(
-                      product.price - (product.price * 0.1).toFixed(2)
-                    )}
+                    {(
+                      product.price -
+                      (product.price * product.discount) / 100
+                    ).toFixed(2)}
                   </p>
                   <p className="products__list-price products__list-price_type-discount">
                     ${product.price.toFixed(2)}

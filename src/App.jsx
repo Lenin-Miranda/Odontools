@@ -6,7 +6,8 @@ import Footer from "./components/Footer/Footer";
 import "./App.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { products } from "./data/productsData";
+import { getApiUrl } from "./config/api";
+import { products as fallbackProducts } from "./data/productsData";
 import { categories } from "./data/categoriesData";
 import { Route, Routes } from "react-router";
 import ProductsPage from "./pages/ProductsPage";
@@ -31,6 +32,7 @@ import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import HomePage from "./components/HomePage/HomePage";
+import { useProducts } from "./hooks/useProducts";
 
 function App() {
   // Estados principales
@@ -52,6 +54,34 @@ function App() {
     isAdmin: false,
   });
   const [isUserOpen, setIsUserOpen] = useState(false);
+
+  // Función para resetear el formulario de autenticación
+  const resetAuthForm = () => {
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      isAdmin: false,
+    });
+    setMessage("");
+  };
+
+  // Limpiar formulario cuando se cierran los modales de login/signup
+  useEffect(() => {
+    if (!isLogginOpen && !isSignUpOpen) {
+      resetAuthForm();
+    }
+  }, [isLogginOpen, isSignUpOpen]);
+
+  // Hook para productos desde la API
+  const {
+    products: apiProducts,
+    fetchProducts,
+    loading: productsLoading,
+  } = useProducts();
+
+  // Estado para productos (usa API o fallback)
+  const [products, setProducts] = useState([]);
 
   // useEffect para inicializar AOS
   useEffect(() => {
@@ -80,7 +110,6 @@ function App() {
         setCurrentUser(userInfo); // ✅ Establecer el usuario
         setIsLoggedIn(true);
         setIsAdmin(savedAdminStatus === "true");
-        console.log("Usuario restaurado desde localStorage:", userInfo);
       } catch (error) {
         console.error("Error al parsear datos del usuario:", error);
         // Limpiar localStorage si hay datos corruptos
@@ -97,7 +126,6 @@ function App() {
       const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
       if (!isLoggedIn || !savedUser) {
-        console.log("No hay sesión activa");
         return;
       }
 
@@ -112,7 +140,7 @@ function App() {
           return;
         }
 
-        const res = await fetch(`http://localhost:3001/api/auth/${userId}`, {
+        const res = await fetch(getApiUrl(`/api/auth/${userId}`), {
           method: "GET",
           credentials: "include", // Envía cookies automáticamente
         });
@@ -131,6 +159,25 @@ function App() {
     };
 
     fetchCurrentUserData();
+  }, []);
+
+  // useEffect para cargar productos desde la API
+  useEffect(() => {
+    const loadProducts = async () => {
+      const result = await fetchProducts();
+
+      if (
+        result.success &&
+        result.data.products &&
+        result.data.products.length > 0
+      ) {
+        setProducts(result.data.products);
+      } else {
+        setProducts(fallbackProducts);
+      }
+    };
+
+    loadProducts();
   }, []);
 
   // Función para guardar el login en localStorage
@@ -153,7 +200,7 @@ function App() {
   const handleLogout = async () => {
     try {
       // Llamar al endpoint de logout para limpiar la cookie
-      await fetch("http://localhost:3001/api/auth/logout", {
+      await fetch(getApiUrl("/api/auth/logout"), {
         method: "POST",
         credentials: "include",
       });
@@ -168,7 +215,6 @@ function App() {
     setIsCartOpen(false); // ✅ Cerrar el modal del carrito
     clearUserFromStorage();
     // El carrito se limpiará automáticamente por el useEffect en UseCart.jsx
-    console.log("Sesión cerrada exitosamente");
   };
 
   const toggleFavorite = (productId) => {
@@ -204,16 +250,13 @@ function App() {
     if (isSignUpOpen) {
       // REGISTRO: Enviar todos los campos (name, email, password)
       try {
-        const response = await fetch(
-          "http://localhost:3001/api/auth/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData), // Envía name, email, password
-          }
-        );
+        const response = await fetch(getApiUrl("/api/auth/register"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData), // Envía name, email, password
+        });
         const data = await response.json();
         if (response.ok) {
           setIsSignUpOpen(false);
@@ -237,7 +280,7 @@ function App() {
           // NO incluir name para login
         };
 
-        const response = await fetch("http://localhost:3001/api/auth/login", {
+        const response = await fetch(getApiUrl("/api/auth/login"), {
           method: "POST",
           credentials: "include", // Envía y recibe cookies automáticamente
           headers: {
@@ -334,7 +377,6 @@ function App() {
           onClick={() => {
             setIsLogginOpen(false);
             setIsSignUpOpen(true);
-            setMessage(""); // Limpiar mensaje al cambiar de modal
           }}
         >
           ¿No tienes cuenta? Regístrate aquí
@@ -403,7 +445,6 @@ function App() {
           onClick={() => {
             setIsSignUpOpen(false);
             setIsLogginOpen(true);
-            setMessage(""); // Limpiar mensaje al cambiar de modal
           }}
         >
           ¿Ya tienes cuenta? Inicia sesión aquí
@@ -519,7 +560,10 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<DashboardProducts />} />
           <Route path="orders" element={<OrdersPage />} />
-          <Route path="users" element={<UsersPage />} />
+          <Route
+            path="users"
+            element={<UsersPage currentUser={currentUser} />}
+          />
           {/* <Route path="analytics" element={<AnalyticsPage />} /> */}
           <Route
             path="settings"

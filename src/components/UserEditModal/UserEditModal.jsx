@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FiUser, FiMail, FiPhone, FiCalendar } from "react-icons/fi";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
+import useConfirm from "../../hooks/useConfirm";
 import "./UserEditModal.css";
 
 export default function UserEditModal({
@@ -18,6 +20,7 @@ export default function UserEditModal({
     role: "cliente",
     status: "active",
   });
+  const { confirmState, showAlert, closeConfirm } = useConfirm();
 
   // Actualizar el formulario cuando cambie el usuario o el modo
   useEffect(() => {
@@ -56,19 +59,31 @@ export default function UserEditModal({
 
     // Validaciones básicas
     if (!formData.name.trim()) {
-      alert("El nombre es obligatorio");
+      showAlert({
+        title: "Campo requerido",
+        message: "El nombre es obligatorio",
+        type: "warning",
+      });
       return;
     }
 
     if (!formData.email.trim()) {
-      alert("El email es obligatorio");
+      showAlert({
+        title: "Campo requerido",
+        message: "El email es obligatorio",
+        type: "warning",
+      });
       return;
     }
 
     // Validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert("Por favor ingresa un email válido");
+      showAlert({
+        title: "Email inválido",
+        message: "Por favor ingresa un email válido",
+        type: "warning",
+      });
       return;
     }
 
@@ -82,9 +97,20 @@ export default function UserEditModal({
     await onSubmit(dataToSend);
   };
 
+  const resetAndClose = () => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      role: "cliente",
+      status: "active",
+    });
+    onClose();
+  };
+
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      resetAndClose();
     }
   };
 
@@ -103,7 +129,7 @@ export default function UserEditModal({
           </h2>
           <button
             className="user-edit-modal__close"
-            onClick={onClose}
+            onClick={resetAndClose}
             disabled={isLoading}
           >
             <AiOutlineClose />
@@ -237,7 +263,7 @@ export default function UserEditModal({
             <div className="user-edit-modal__footer">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={resetAndClose}
                 className="user-edit-modal__button user-edit-modal__button--cancel"
                 disabled={isLoading}
               >
@@ -254,6 +280,19 @@ export default function UserEditModal({
           )}
         </form>
       </div>
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText={confirmState.confirmText}
+        cancelText={confirmState.cancelText}
+        type={confirmState.type}
+        showCancel={confirmState.showCancel}
+      />
     </div>
   );
 }

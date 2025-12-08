@@ -20,7 +20,6 @@ export default function CartModal({
     useCart();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  console.log("User Info in CartModal:", userInfo);
 
   // ✅ useEffect para cerrar con Escape
   useEffect(() => {
@@ -128,8 +127,11 @@ export default function CartModal({
                       <div className="cart__modal-container-list-item-r-container">
                         <p className="cart__modal-container-list-item-r-container-price">
                           $
-                          {product.discount
-                            ? (product.price * 0.9).toFixed(2)
+                          {product.discount > 0
+                            ? (
+                                product.price -
+                                (product.price * product.discount) / 100
+                              ).toFixed(2)
                             : product.price}
                         </p>
 
@@ -233,10 +235,7 @@ export default function CartModal({
                     letterSpacing: "0",
                   }}
                 >
-                  $
-                  {cartTotal > 100
-                    ? cartTotal.toFixed(2)
-                    : cartTotal.toFixed(2) + 10}
+                  ${cartTotal > 100 ? cartTotal.toFixed(2) : cartTotal + 10}
                 </span>
               </div>
               <div className="cart__modal-container-payment-buttons">
