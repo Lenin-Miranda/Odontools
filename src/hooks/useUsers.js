@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiUrl } from "../config/api";
 
 export const useUsers = () => {
   const [users, setUsers] = useState([]);
@@ -11,7 +12,7 @@ export const useUsers = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/auth", {
+      const response = await fetch(getApiUrl("/api/auth"), {
         credentials: "include", // Envía cookies automáticamente
       });
 
@@ -46,7 +47,7 @@ export const useUsers = () => {
         throw new Error("ID de usuario inválido para consulta");
       }
 
-      const response = await fetch(`http://localhost:3001/api/auth/${id}`, {
+      const response = await fetch(getApiUrl(`/api/auth/${id}`), {
         credentials: "include", // Envía cookies automáticamente
       });
 
@@ -75,7 +76,7 @@ export const useUsers = () => {
         throw new Error("ID de usuario inválido para actualización");
       }
 
-      const response = await fetch(`http://localhost:3001/api/auth/${id}`, {
+      const response = await fetch(getApiUrl(`/api/auth/${id}`), {
         method: "PUT",
         credentials: "include", // Envía cookies automáticamente
         headers: {
@@ -127,7 +128,7 @@ export const useUsers = () => {
         throw new Error("ID de usuario inválido");
       }
 
-      const response = await fetch(`http://localhost:3001/api/auth/${id}`, {
+      const response = await fetch(getApiUrl(`/api/auth/${id}`), {
         method: "DELETE",
         credentials: "include", // Envía cookies automáticamente
       });

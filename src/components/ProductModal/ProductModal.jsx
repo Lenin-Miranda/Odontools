@@ -622,22 +622,27 @@ export default function ProductModal({
               />
             </div>
             <div className="product-modal__field">
-              <label className="product-modal__label">
-                <input
-                  name="discount"
-                  type="checkbox"
-                  checked={formData.discount}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      discount: e.target.checked,
-                    }))
-                  }
-                  className="product-modal__checkbox"
-                  disabled={mode === "view"}
-                />
-                Producto en descuento
+              <label
+                className="product-modal__label"
+                htmlFor="product-discount"
+              >
+                Descuento (%)
               </label>
+              <input
+                id="product-discount"
+                name="discount"
+                type="number"
+                min="0"
+                max="100"
+                value={formData.discount}
+                onChange={handleInputChange}
+                className="product-modal__input"
+                placeholder="0"
+                readOnly={mode === "view"}
+              />
+              <small style={{ color: "#666", fontSize: "0.85rem" }}>
+                Ingresa el porcentaje de descuento (0-100)
+              </small>
             </div>
           </div>
 

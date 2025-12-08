@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { handleAuthError } from "../utils/auth";
+import { getApiUrl } from "../config/api";
 
 const CartContext = createContext();
 
@@ -61,7 +62,7 @@ export function CartProvider({ children }) {
         return;
       }
 
-      const res = await fetch("http://localhost:3001/api/cart", {
+      const res = await fetch(getApiUrl("/api/cart"), {
         method: "GET",
         credentials: "include", // Envía cookies automáticamente
         headers: {
@@ -93,7 +94,7 @@ export function CartProvider({ children }) {
         return;
       }
 
-      const res = await fetch("http://localhost:3001/api/cart/add", {
+      const res = await fetch(getApiUrl("/api/cart/add"), {
         method: "POST",
         credentials: "include", // Envía cookies automáticamente
         headers: {
@@ -146,7 +147,7 @@ export function CartProvider({ children }) {
       const loggedIn = localStorage.getItem("isLoggedIn") === "true";
       if (!loggedIn) return;
 
-      const res = await fetch(`http://localhost:3001/api/cart/decrease/${id}`, {
+      const res = await fetch(getApiUrl(`/api/cart/decrease/${id}`), {
         method: "POST",
         credentials: "include", // Envía cookies automáticamente
         headers: {
@@ -173,7 +174,7 @@ export function CartProvider({ children }) {
       const loggedIn = localStorage.getItem("isLoggedIn") === "true";
       if (!loggedIn) return;
 
-      const res = await fetch("http://localhost:3001/api/cart/clear", {
+      const res = await fetch(getApiUrl("/api/cart/clear"), {
         method: "DELETE",
         credentials: "include", // Envía cookies automáticamente
         headers: {
@@ -202,7 +203,7 @@ export function CartProvider({ children }) {
       const loggedIn = localStorage.getItem("isLoggedIn") === "true";
       if (!loggedIn) return;
 
-      const res = await fetch(`http://localhost:3001/api/cart/${id}`, {
+      const res = await fetch(getApiUrl(`/api/cart/${id}`), {
         method: "DELETE",
         credentials: "include", // Envía cookies automáticamente
         headers: {
@@ -229,7 +230,7 @@ export function CartProvider({ children }) {
       const loggedIn = localStorage.getItem("isLoggedIn") === "true";
       if (!loggedIn) return;
 
-      const res = await fetch(`http://localhost:3001/api/cart/increase/${id}`, {
+      const res = await fetch(getApiUrl(`/api/cart/increase/${id}`), {
         method: "POST",
         credentials: "include", // Envía cookies automáticamente
         headers: {

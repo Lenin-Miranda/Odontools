@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/UseCart";
+import { getApiUrl } from "../config/api";
 import {
   FiShoppingCart,
   FiPackage,
@@ -35,9 +36,7 @@ const ProductDetailPage = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `http://localhost:3001/api/products/${id}`
-        );
+        const response = await fetch(getApiUrl(`/api/products/${id}`));
 
         if (!response.ok) {
           throw new Error("Producto no encontrado");
@@ -97,9 +96,10 @@ const ProductDetailPage = () => {
     );
   }
 
-  const discountedPrice = product.discount
-    ? (product.price - product.price * 0.1).toFixed(2)
-    : product.price.toFixed(2);
+  const discountedPrice =
+    product.discount > 0
+      ? (product.price - (product.price * product.discount) / 100).toFixed(2)
+      : product.price.toFixed(2);
 
   const isOutOfStock = product.stock === 0;
   const isAlreadyInCart = isInCart(product._id || product.id);
@@ -132,9 +132,9 @@ const ProductDetailPage = () => {
                   Agotado
                 </div>
               )}
-              {!isOutOfStock && product.discount && (
+              {!isOutOfStock && product.discount > 0 && (
                 <div className="gallery__badge gallery__badge--discount">
-                  -10% OFF
+                  -{product.discount}%
                 </div>
               )}
               <img
@@ -199,13 +199,15 @@ const ProductDetailPage = () => {
               data-aos="zoom-in"
               data-aos-delay="300"
             >
-              {product.discount ? (
+              {product.discount > 0 ? (
                 <>
                   <span className="price__current">${discountedPrice}</span>
                   <span className="price__original">
                     ${product.price.toFixed(2)}
                   </span>
-                  <span className="price__discount">Ahorras 10%</span>
+                  <span className="price__discount">
+                    Ahorras {product.discount}%
+                  </span>
                 </>
               ) : (
                 <span className="price__current">

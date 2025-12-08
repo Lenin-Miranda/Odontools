@@ -636,9 +636,58 @@ export default function OrdersPage() {
                     ? "💳 Tarjeta"
                     : "🏦 Transferencia"}
                 </p>
-                <p className="orders-page__modal-total">
-                  <strong>Total:</strong> ${selectedOrder.totalPrice.toFixed(2)}
-                </p>
+                <div
+                  style={{
+                    marginTop: "1rem",
+                    paddingTop: "1rem",
+                    borderTop: "1px solid #e5e7eb",
+                  }}
+                >
+                  <p
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    <span>Subtotal:</span>
+                    <span>
+                      $
+                      {(
+                        selectedOrder.totalPrice -
+                        (selectedOrder.shippingCost || 0)
+                      ).toFixed(2)}
+                    </span>
+                  </p>
+                  <p
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "0.5rem",
+                      color:
+                        selectedOrder.shippingCost > 0 ? "#ef4444" : "#10b981",
+                    }}
+                  >
+                    <span>Envío:</span>
+                    <span>
+                      {selectedOrder.shippingCost > 0
+                        ? `$${selectedOrder.shippingCost.toFixed(2)}`
+                        : "Gratis"}
+                    </span>
+                  </p>
+                  <p
+                    className="orders-page__modal-total"
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      paddingTop: "0.5rem",
+                      borderTop: "2px solid #3b82f6",
+                    }}
+                  >
+                    <strong>Total:</strong>
+                    <strong>${selectedOrder.totalPrice.toFixed(2)}</strong>
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ import Footer from "./components/Footer/Footer";
 import "./App.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { getApiUrl } from "./config/api";
 import { products as fallbackProducts } from "./data/productsData";
 import { categories } from "./data/categoriesData";
 import { Route, Routes } from "react-router";
@@ -53,6 +54,24 @@ function App() {
     isAdmin: false,
   });
   const [isUserOpen, setIsUserOpen] = useState(false);
+
+  // Función para resetear el formulario de autenticación
+  const resetAuthForm = () => {
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      isAdmin: false,
+    });
+    setMessage("");
+  };
+
+  // Limpiar formulario cuando se cierran los modales de login/signup
+  useEffect(() => {
+    if (!isLogginOpen && !isSignUpOpen) {
+      resetAuthForm();
+    }
+  }, [isLogginOpen, isSignUpOpen]);
 
   // Hook para productos desde la API
   const {
@@ -123,7 +142,7 @@ function App() {
           return;
         }
 
-        const res = await fetch(`http://localhost:3001/api/auth/${userId}`, {
+        const res = await fetch(getApiUrl(`/api/auth/${userId}`), {
           method: "GET",
           credentials: "include", // Envía cookies automáticamente
         });
@@ -191,7 +210,7 @@ function App() {
   const handleLogout = async () => {
     try {
       // Llamar al endpoint de logout para limpiar la cookie
-      await fetch("http://localhost:3001/api/auth/logout", {
+      await fetch(getApiUrl("/api/auth/logout"), {
         method: "POST",
         credentials: "include",
       });
@@ -242,16 +261,13 @@ function App() {
     if (isSignUpOpen) {
       // REGISTRO: Enviar todos los campos (name, email, password)
       try {
-        const response = await fetch(
-          "http://localhost:3001/api/auth/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData), // Envía name, email, password
-          }
-        );
+        const response = await fetch(getApiUrl("/api/auth/register"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData), // Envía name, email, password
+        });
         const data = await response.json();
         if (response.ok) {
           setIsSignUpOpen(false);
@@ -275,7 +291,7 @@ function App() {
           // NO incluir name para login
         };
 
-        const response = await fetch("http://localhost:3001/api/auth/login", {
+        const response = await fetch(getApiUrl("/api/auth/login"), {
           method: "POST",
           credentials: "include", // Envía y recibe cookies automáticamente
           headers: {
@@ -372,7 +388,6 @@ function App() {
           onClick={() => {
             setIsLogginOpen(false);
             setIsSignUpOpen(true);
-            setMessage(""); // Limpiar mensaje al cambiar de modal
           }}
         >
           ¿No tienes cuenta? Regístrate aquí
@@ -441,7 +456,6 @@ function App() {
           onClick={() => {
             setIsSignUpOpen(false);
             setIsLogginOpen(true);
-            setMessage(""); // Limpiar mensaje al cambiar de modal
           }}
         >
           ¿Ya tienes cuenta? Inicia sesión aquí

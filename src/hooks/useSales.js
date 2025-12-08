@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { handleAuthError } from "../utils/auth";
+import { getApiUrl } from "../config/api";
 
 export const useSales = () => {
   const [sales, setSales] = useState([]);
@@ -12,7 +13,7 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/sales", {
+      const response = await fetch(getApiUrl("/api/sales"), {
         credentials: "include", // Envía cookies automáticamente
       });
 
@@ -45,7 +46,7 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/sales", {
+      const response = await fetch(getApiUrl("/api/sales"), {
         method: "POST",
         credentials: "include", // Envía cookies automáticamente
         headers: {
@@ -83,7 +84,7 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/sales/user", {
+      const response = await fetch(getApiUrl("/api/sales/user"), {
         credentials: "include", // Envía cookies automáticamente
       });
 
@@ -116,12 +117,9 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch(
-        `http://localhost:3001/api/sales/${saleId}`,
-        {
-          credentials: "include", // Envía cookies automáticamente
-        }
-      );
+      const response = await fetch(getApiUrl(`/api/sales/${saleId}`), {
+        credentials: "include", // Envía cookies automáticamente
+      });
 
       // ✅ Manejar error de autenticación
       if (await handleAuthError(response)) {
@@ -150,17 +148,14 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch(
-        `http://localhost:3001/api/sales/${saleId}/status`,
-        {
-          method: "PUT",
-          credentials: "include", // Envía cookies automáticamente
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status }),
-        }
-      );
+      const response = await fetch(getApiUrl(`/api/sales/${saleId}/status`), {
+        method: "PUT",
+        credentials: "include", // Envía cookies automáticamente
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
 
       // ✅ Manejar error de autenticación
       if (await handleAuthError(response)) {
@@ -196,17 +191,14 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch(
-        `http://localhost:3001/api/sales/${saleId}/status`,
-        {
-          method: "PUT",
-          credentials: "include", // Envía cookies automáticamente
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: "confirmado" }),
-        }
-      );
+      const response = await fetch(getApiUrl(`/api/sales/${saleId}/status`), {
+        method: "PUT",
+        credentials: "include", // Envía cookies automáticamente
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "confirmado" }),
+      });
 
       // ✅ Manejar error de autenticación
       if (await handleAuthError(response)) {
@@ -244,12 +236,9 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch(
-        `http://localhost:3001/api/sales/${saleId}/export`,
-        {
-          credentials: "include", // Envía cookies automáticamente
-        }
-      );
+      const response = await fetch(getApiUrl(`/api/sales/${saleId}/export`), {
+        credentials: "include", // Envía cookies automáticamente
+      });
 
       // ✅ Manejar error de autenticación
       if (await handleAuthError(response)) {
@@ -258,20 +247,21 @@ export const useSales = () => {
       }
 
       if (!response.ok) {
-        throw new Error("Error al exportar la venta");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error al exportar la venta");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `sale_${saleId}.txt`;
+      a.download = `factura_${saleId}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      console.log("📄 Venta exportada exitosamente");
+      console.log("📄 Factura exportada exitosamente");
 
       return { success: true };
     } catch (err) {
@@ -288,12 +278,9 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch(
-        "http://localhost:3001/api/sales/csv-export",
-        {
-          credentials: "include", // Envía cookies automáticamente
-        }
-      );
+      const response = await fetch(getApiUrl("/api/sales/csv-export"), {
+        credentials: "include", // Envía cookies automáticamente
+      });
 
       // ✅ Manejar error de autenticación
       if (await handleAuthError(response)) {
@@ -338,12 +325,9 @@ export const useSales = () => {
     setError(null);
 
     try {
-      const response = await fetch(
-        "http://localhost:3001/api/sales/user/csv-export",
-        {
-          credentials: "include", // Envía cookies automáticamente
-        }
-      );
+      const response = await fetch(getApiUrl("/api/sales/user/csv-export"), {
+        credentials: "include", // Envía cookies automáticamente
+      });
 
       // ✅ Manejar error de autenticación
       if (await handleAuthError(response)) {

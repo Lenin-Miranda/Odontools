@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiUrl } from "../config/api";
 
 export const useProducts = () => {
   const [products, setProducts] = useState([]);
@@ -26,7 +27,7 @@ export const useProducts = () => {
         // Aunque no haya imagen, enviamos como FormData para consistencia
       }
 
-      const response = await fetch("http://localhost:3001/api/products", {
+      const response = await fetch(getApiUrl("/api/products"), {
         method: "POST",
         credentials: "include", // Envía cookies automáticamente
         body: formData, // Enviar FormData directamente
@@ -78,7 +79,7 @@ export const useProducts = () => {
         console.log("📝 Actualizando sin cambiar imagen");
       }
 
-      const response = await fetch(`http://localhost:3001/api/products/${id}`, {
+      const response = await fetch(getApiUrl(`/api/products/${id}`), {
         method: "PUT",
         credentials: "include", // Envía cookies automáticamente
         body: formData, // Enviar FormData directamente
@@ -123,7 +124,7 @@ export const useProducts = () => {
 
       console.log(`🗑️ Eliminando producto con ID: ${id}`);
 
-      const response = await fetch(`http://localhost:3001/api/products/${id}`, {
+      const response = await fetch(getApiUrl(`/api/products/${id}`), {
         method: "DELETE",
         credentials: "include", // Envía cookies automáticamente
       });
@@ -160,7 +161,7 @@ export const useProducts = () => {
 
       console.log(`🔍 Obteniendo producto con ID: ${id}`);
 
-      const response = await fetch(`http://localhost:3001/api/products/${id}`, {
+      const response = await fetch(getApiUrl(`/api/products/${id}`), {
         credentials: "include", // Envía cookies automáticamente
       });
 
@@ -187,7 +188,7 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/products", {
+      const response = await fetch(getApiUrl("/api/products"), {
         credentials: "include", // Envía cookies automáticamente
       });
 
@@ -260,7 +261,7 @@ export const useProducts = () => {
       console.log(`🗑️ Eliminando imagen del producto ${productId}:`, imageUrl);
 
       const response = await fetch(
-        `http://localhost:3001/api/products/${productId}/images`,
+        getApiUrl(`/api/products/${productId}/images`),
         {
           method: "DELETE",
           credentials: "include",

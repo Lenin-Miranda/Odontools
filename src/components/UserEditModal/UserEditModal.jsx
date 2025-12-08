@@ -97,9 +97,20 @@ export default function UserEditModal({
     await onSubmit(dataToSend);
   };
 
+  const resetAndClose = () => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      role: "cliente",
+      status: "active",
+    });
+    onClose();
+  };
+
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      resetAndClose();
     }
   };
 
@@ -118,7 +129,7 @@ export default function UserEditModal({
           </h2>
           <button
             className="user-edit-modal__close"
-            onClick={onClose}
+            onClick={resetAndClose}
             disabled={isLoading}
           >
             <AiOutlineClose />
@@ -252,7 +263,7 @@ export default function UserEditModal({
             <div className="user-edit-modal__footer">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={resetAndClose}
                 className="user-edit-modal__button user-edit-modal__button--cancel"
                 disabled={isLoading}
               >
