@@ -1,4 +1,4 @@
-import "./Navbar.css";
+import "./NavBar.css";
 import { FaShoppingCart } from "react-icons/fa";
 
 import { Link } from "react-scroll";
