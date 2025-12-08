@@ -96,11 +96,6 @@ const UsersPage = ({ currentUser }) => {
     const userName = user.name;
     const currentUserId = String(currentUser?._id || currentUser?.id);
 
-      userId,
-      currentUserId,
-      match: userId === currentUserId,
-    });
-
     // Prevenir eliminación del usuario actual
     if (userId === currentUserId) {
       setMessage("No puedes eliminar tu propia cuenta mientras estás logueado");

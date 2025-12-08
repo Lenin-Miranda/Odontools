@@ -171,13 +171,8 @@ function App() {
         result.data.products &&
         result.data.products.length > 0
       ) {
-          "✅ Productos cargados desde la API:",
-          result.data.products.length
-        );
         setProducts(result.data.products);
       } else {
-          "⚠️ No se pudieron cargar productos desde la API, usando datos estáticos"
-        );
         setProducts(fallbackProducts);
       }
     };
