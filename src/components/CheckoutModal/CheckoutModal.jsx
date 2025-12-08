@@ -8,7 +8,6 @@ import "./CheckoutModal.css";
 export default function CheckoutModal({ isOpen, onClose, userInfo }) {
   const { cart, cartTotal, clearCart } = useCart();
   const { createSale, loading } = useSales();
-  console.log("User Info in CheckoutModal:", userInfo);
 
   const [formData, setFormData] = useState({
     paymentMethod: "cash",

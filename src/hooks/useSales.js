@@ -28,7 +28,6 @@ export const useSales = () => {
       }
 
       const result = await response.json();
-      console.log("💰 Datos de ventas recibidos del backend:", result);
       setSales(result.sales || []);
 
       return { success: true, data: result.sales };
@@ -67,7 +66,6 @@ export const useSales = () => {
       }
 
       const result = await response.json();
-      console.log("✅ Venta creada:", result);
 
       return { success: true, data: result.sale };
     } catch (err) {
@@ -99,7 +97,6 @@ export const useSales = () => {
       }
 
       const result = await response.json();
-      console.log("📦 Órdenes del usuario:", result);
       setSales(result.sales || []);
 
       return { success: true, data: result.sales };
@@ -169,7 +166,6 @@ export const useSales = () => {
       }
 
       const result = await response.json();
-      console.log("✅ Estado actualizado:", result);
 
       // Actualizar la lista local
       setSales((prev) =>
@@ -212,7 +208,6 @@ export const useSales = () => {
       }
 
       const result = await response.json();
-      console.log("✅ Venta confirmada y stock descontado:", result);
 
       // Actualizar la lista local
       setSales((prev) =>
@@ -261,7 +256,6 @@ export const useSales = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      console.log("📄 Factura exportada exitosamente");
 
       return { success: true };
     } catch (err) {
@@ -307,7 +301,6 @@ export const useSales = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      console.log("📊 Ventas exportadas a CSV exitosamente");
 
       return { success: true };
     } catch (err) {
@@ -349,7 +342,6 @@ export const useSales = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      console.log("📊 Mis órdenes exportadas a CSV exitosamente");
 
       return { success: true };
     } catch (err) {

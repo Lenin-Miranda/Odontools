@@ -216,7 +216,6 @@ export default function ProductModal({
           setAdditionalPreviews((prev) =>
             prev.filter((img) => img !== imageUrl)
           );
-          console.log("✅ Imagen eliminada del servidor");
         } else {
           console.error("❌ Error al eliminar imagen:", result.error);
           showAlert({

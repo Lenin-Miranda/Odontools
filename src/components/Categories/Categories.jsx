@@ -20,8 +20,6 @@ export default function Categories({ categories, onCategoryClick, products }) {
         ).length
       : 0;
 
-    console.log(`📊 Categoría: ${category.name}, Productos: ${productCount}`);
-    console.log("Productos disponibles:", products);
 
     return (
       <li

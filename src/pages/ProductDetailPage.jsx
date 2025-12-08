@@ -28,7 +28,6 @@ const ProductDetailPage = () => {
   const allImages = useMemo(() => {
     if (!product) return [];
     const images = [product.image, ...(product.images || [])].filter(Boolean);
-    console.log("📸 Imágenes disponibles:", images);
     return images;
   }, [product]);
 
@@ -160,7 +159,6 @@ const ProductDetailPage = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      console.log(`🖼️ Cambiando a imagen ${index}`);
                       setSelectedImageIndex(index);
                     }}
                     style={{ cursor: "pointer" }}

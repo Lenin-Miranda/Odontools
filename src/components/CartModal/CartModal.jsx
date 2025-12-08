@@ -20,7 +20,6 @@ export default function CartModal({
     useCart();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  console.log("User Info in CartModal:", userInfo);
 
   // ✅ useEffect para cerrar con Escape
   useEffect(() => {

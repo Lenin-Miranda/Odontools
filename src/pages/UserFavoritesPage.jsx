@@ -110,7 +110,6 @@ const UserFavoritesPage = () => {
 
   const addToCart = (product) => {
     // Implementar lógica para agregar al carrito
-    console.log("Agregado al carrito:", product);
     // Aquí se conectaría con el hook useCart
   };
 

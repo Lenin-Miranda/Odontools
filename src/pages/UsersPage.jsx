@@ -96,7 +96,6 @@ const UsersPage = ({ currentUser }) => {
     const userName = user.name;
     const currentUserId = String(currentUser?._id || currentUser?.id);
 
-    console.log("🔍 Comparando IDs:", {
       userId,
       currentUserId,
       match: userId === currentUserId,

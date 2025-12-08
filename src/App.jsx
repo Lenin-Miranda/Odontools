@@ -110,7 +110,6 @@ function App() {
         setCurrentUser(userInfo); // ✅ Establecer el usuario
         setIsLoggedIn(true);
         setIsAdmin(savedAdminStatus === "true");
-        console.log("Usuario restaurado desde localStorage:", userInfo);
       } catch (error) {
         console.error("Error al parsear datos del usuario:", error);
         // Limpiar localStorage si hay datos corruptos
@@ -127,7 +126,6 @@ function App() {
       const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
       if (!isLoggedIn || !savedUser) {
-        console.log("No hay sesión activa");
         return;
       }
 
@@ -166,7 +164,6 @@ function App() {
   // useEffect para cargar productos desde la API
   useEffect(() => {
     const loadProducts = async () => {
-      console.log("🔄 Cargando productos desde la API...");
       const result = await fetchProducts();
 
       if (
@@ -174,13 +171,11 @@ function App() {
         result.data.products &&
         result.data.products.length > 0
       ) {
-        console.log(
           "✅ Productos cargados desde la API:",
           result.data.products.length
         );
         setProducts(result.data.products);
       } else {
-        console.log(
           "⚠️ No se pudieron cargar productos desde la API, usando datos estáticos"
         );
         setProducts(fallbackProducts);
@@ -225,7 +220,6 @@ function App() {
     setIsCartOpen(false); // ✅ Cerrar el modal del carrito
     clearUserFromStorage();
     // El carrito se limpiará automáticamente por el useEffect en UseCart.jsx
-    console.log("Sesión cerrada exitosamente");
   };
 
   const toggleFavorite = (productId) => {

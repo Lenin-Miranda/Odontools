@@ -30,7 +30,6 @@ export default function UserModal({
   const [userOrders, setUserOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
 
-  console.log("UserModal user:", user);
 
   // Cargar pedidos del usuario
   useEffect(() => {

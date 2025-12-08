@@ -21,11 +21,9 @@ export const useUsers = () => {
       }
 
       const result = await response.json();
-      console.log("🔍 Datos recibidos del backend:", result);
 
       // Ajustar según la estructura de respuesta del backend
       const usersData = result.users || result.data || result || [];
-      console.log("👥 Usuarios procesados:", usersData);
       setUsers(usersData);
 
       return { success: true, data: result };

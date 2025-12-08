@@ -28,7 +28,6 @@ export default function AdminNavBar() {
 
   const handleLogout = () => {
     // Aquí irá la lógica de logout cuando conectes el backend
-    console.log("Logout admin");
   };
 
   return (
