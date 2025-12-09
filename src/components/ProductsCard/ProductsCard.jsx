@@ -3,6 +3,7 @@ import "./ProductsCard.css";
 import { useCart } from "../../hooks/UseCart";
 import { FiPackage } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl, PLACEHOLDER_IMAGE } from "../../config/api";
 
 export default function ProductsCard({ products, isFeatured = false }) {
   const { addToCart, isInCart } = useCart();
@@ -45,11 +46,10 @@ export default function ProductsCard({ products, isFeatured = false }) {
         >
           <img
             className="products__list-image"
-            src={product.image}
+            src={getImageUrl(product.image) || PLACEHOLDER_IMAGE}
             alt={product.name}
             onError={(e) => {
-              e.target.src =
-                "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDMwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMjUgMTAwSDkwVjE0MEgxMjVWMTc1SDE2NVYxNDBIMjAwVjEwMEgxNjVWNzVIMTI1VjEwMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHRLEHT4geDEHNTAiIHk9IjE4NSIgZmlsbD0iIzlDQTNBRiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Qcm9kdWN0bzwvdGV4dD4KPC9zdmc+";
+              e.target.src = PLACEHOLDER_IMAGE;
             }}
           />
           <div className="products__list-container">
