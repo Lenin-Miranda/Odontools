@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/UseCart";
-import { getApiUrl, getImageUrl, PLACEHOLDER_IMAGE } from "../config/api";
+import { getApiUrl } from "../config/api";
 import {
   FiShoppingCart,
   FiPackage,
@@ -26,11 +26,9 @@ const ProductDetailPage = () => {
 
   // Obtener todas las imágenes (principal + galería) usando useMemo para evitar recalculaciones
   const allImages = useMemo(() => {
-    if (!product) return [PLACEHOLDER_IMAGE];
-    const images = [product.image, ...(product.images || [])]
-      .filter(Boolean)
-      .map(img => getImageUrl(img) || PLACEHOLDER_IMAGE);
-    return images.length > 0 ? images : [PLACEHOLDER_IMAGE];
+    if (!product) return [];
+    const images = [product.image, ...(product.images || [])].filter(Boolean);
+    return images;
   }, [product]);
 
   useEffect(() => {
@@ -139,11 +137,12 @@ const ProductDetailPage = () => {
                 </div>
               )}
               <img
-                src={allImages[selectedImageIndex]}
+                src={allImages[selectedImageIndex] || product.image}
                 alt={`${product.name} - Imagen ${selectedImageIndex + 1}`}
                 className="gallery__main-image"
                 onError={(e) => {
-                  e.target.src = PLACEHOLDER_IMAGE;
+                  e.target.src =
+                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMDAgMTUwSDE1MFYyMDBIMjAwVjI1MEgyNTBWMjAwSDMwMFYxNTBIMjUwVjEwMEgyMDBWMTUwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4=";
                 }}
               />
             </div>
