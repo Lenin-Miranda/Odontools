@@ -21,7 +21,7 @@ export default function ProductModal({
     stock: mode === "edit" || mode === "view" ? product?.stock || "" : "",
     description:
       mode === "edit" || mode === "view" ? product?.description || "" : "",
-    reviews: mode === "edit" || mode === "view" ? product?.reviews || 0 : 0,
+    sku: mode === "edit" || mode === "view" ? product?.sku || "" : "",
     discount:
       mode === "edit" || mode === "view" ? product?.discount || false : false,
     isFavorite:
@@ -52,8 +52,8 @@ export default function ProductModal({
         price: "",
         stock: "",
         description: "",
-        reviews: 0,
-        discount: false,
+        sku: "",
+        discount: 0,
         isFavorite: false,
         image: null,
         images: [],
@@ -65,11 +65,11 @@ export default function ProductModal({
       setFormData({
         name: product.name || "",
         category: product.category || "",
-        price: product.price || "",
-        stock: product.stock || "",
+        price: product.price || 0,
+        stock: product.stock || 0,
         description: product.description || "",
-        reviews: product.reviews || 0,
-        discount: product.discount || false,
+        sku: product.sku || "",
+        discount: product.discount || 0,
         isFavorite: product.isFavorite || false,
         image: null, // La imagen existente se maneja por separado
         images: [],
@@ -238,7 +238,7 @@ export default function ProductModal({
     submitData.append("price", formData.price);
     submitData.append("stock", formData.stock);
     submitData.append("description", formData.description);
-    submitData.append("reviews", formData.reviews);
+    submitData.append("sku", formData.sku || "Desconocido");
     submitData.append("discount", formData.discount);
     submitData.append("isFavorite", formData.isFavorite);
 
@@ -264,7 +264,7 @@ export default function ProductModal({
       price: "",
       stock: "",
       description: "",
-      reviews: 0,
+      sku: "",
       discount: false,
       isFavorite: false,
       image: null,
@@ -602,21 +602,20 @@ export default function ProductModal({
             />
           </div>
 
-          {/* Reviews y Discount */}
+          {/* SKU y Discount */}
           <div className="product-modal__row">
             <div className="product-modal__field">
-              <label className="product-modal__label" htmlFor="product-reviews">
-                Número de Reseñas
+              <label className="product-modal__label" htmlFor="product-sku">
+                SKU (Código del Producto)
               </label>
               <input
-                id="product-reviews"
-                name="reviews"
-                type="number"
-                min="0"
-                value={formData.reviews}
+                id="product-sku"
+                name="sku"
+                type="text"
+                value={formData.sku}
                 onChange={handleInputChange}
                 className="product-modal__input"
-                placeholder="0"
+                placeholder="Ej: PROD-001"
                 readOnly={mode === "view"}
               />
             </div>

@@ -225,6 +225,7 @@ export default function DashboardProducts() {
                         <th>Imagen</th>
                         <th>Nombre</th>
                         <th>Categoría</th>
+                        <th>SKU</th>
                         <th>Precio</th>
                         <th>Stock</th>
                         <th>Acciones</th>
@@ -251,6 +252,11 @@ export default function DashboardProducts() {
                           <td className="product__page-table-cell">
                             <span className="product__page-table-category">
                               {product.category}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span className="product__page-table-sku">
+                              {product.sku || "Desconocido"}
                             </span>
                           </td>
                           <td className="product__page-table-cell">
