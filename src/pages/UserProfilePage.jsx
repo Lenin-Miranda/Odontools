@@ -66,12 +66,12 @@ const UserProfilePage = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Simular llamada a API
+      // Llamada a API con cookies
       const response = await fetch(getApiUrl(`/api/auth/profile`), {
         method: "PUT",
+        credentials: "include", // Envía cookies automáticamente
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(formData),
       });
