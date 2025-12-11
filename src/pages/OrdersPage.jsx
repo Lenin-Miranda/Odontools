@@ -326,6 +326,11 @@ export default function OrdersPage() {
                       <span className="orders-page__customer-email">
                         {order.user?.email || "N/A"}
                       </span>
+                      {order.customerPhone && (
+                        <span className="orders-page__customer-phone">
+                          📱 {order.customerPhone}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="orders-page__table-cell">
@@ -419,6 +424,11 @@ export default function OrdersPage() {
                   <div className="orders-page__card-customer-email">
                     {order.user?.email || "N/A"}
                   </div>
+                  {order.customerPhone && (
+                    <div className="orders-page__card-customer-phone">
+                      📱 {order.customerPhone}
+                    </div>
+                  )}
                 </div>
 
                 <div className="orders-page__card-total">
