@@ -21,24 +21,29 @@ export default function ProductsCard({ products, isFeatured = false }) {
 
   const productsList = products.map((product, index) => {
     const productId = product._id || product.id;
+    const isOutOfStock = product.stock === 0;
+    const hasDiscount = product.discount > 0;
 
     return (
-      <li
-        className="products__list-item"
-        key={productId}
-        data-aos="fade-up"
-        data-aos-delay={index * 50}
-      >
-        {product.stock === 0 ? (
-          <span
-            className="products__list-offer"
-            style={{ backgroundColor: "#ccc", color: "#000" }}
-          >
-            Agotado
-          </span>
-        ) : product.discount > 0 ? (
-          <span className="products__list-offer">-{product.discount}%</span>
-        ) : null}
+      <li className="products__list-item" key={productId} data-aos="fade-up">
+        <div className="products__badges">
+          {isOutOfStock ? (
+            <span className="products__badge products__badge--sold-out">
+              Agotado
+            </span>
+          ) : hasDiscount ? (
+            <span className="products__badge products__badge--discount">
+              -{product.discount}%
+            </span>
+          ) : null}
+
+          {!isOutOfStock && index === 0 && (
+            <span className="products__badge products__badge--popular">
+              🔥 Popular
+            </span>
+          )}
+        </div>
+
         <div
           className="products__list-clickable"
           onClick={() => navigate(`/products/${productId}`)}
@@ -53,52 +58,76 @@ export default function ProductsCard({ products, isFeatured = false }) {
             }}
           />
           <div className="products__list-container">
-            <p className="products__list-categorie">
-              {product.category || product.categorie}
-            </p>
+            <div className="products__list-header">
+              <span className="products__list-categorie">
+                {product.category || product.categorie}
+              </span>
+            </div>
+
             <h3 className="products__list-name">{product.name}</h3>
+
             <p className="products__list-description">
-              {product.description?.length > 100
-                ? `${product.description.substring(0, 100)}...`
+              {product.description?.length > 80
+                ? `${product.description.substring(0, 80)}...`
                 : product.description}
             </p>
-            <div className="products__list-reviews"></div>
-            <div className="products__list-price-container">
-              {product.discount > 0 ? (
-                <>
+
+            <div className="products__list-footer">
+              <div className="products__list-price-container">
+                {product.discount > 0 ? (
+                  <>
+                    <p className="products__list-price">
+                      $
+                      {(
+                        product.price -
+                        (product.price * product.discount) / 100
+                      ).toFixed(2)}
+                    </p>
+                    <p className="products__list-price products__list-price--discount">
+                      ${product.price.toFixed(2)}
+                    </p>
+                  </>
+                ) : (
                   <p className="products__list-price">
-                    $
-                    {(
-                      product.price -
-                      (product.price * product.discount) / 100
-                    ).toFixed(2)}
-                  </p>
-                  <p className="products__list-price products__list-price_type-discount">
                     ${product.price.toFixed(2)}
                   </p>
-                </>
-              ) : (
-                <p className="products__list-price">
-                  ${product.price.toFixed(2)}
-                </p>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         <button
-          className="products__list-button"
+          className={`products__list-button ${
+            isOutOfStock ? "products__list-button--disabled" : ""
+          }`}
           onClick={(e) => {
             e.stopPropagation();
-            addToCart(product);
+            if (!isOutOfStock) {
+              addToCart(product);
+            }
           }}
-          disabled={product.stock === 0}
-          style={{
-            backgroundColor: product.stock === 0 ? "#ccc" : "#000",
-            cursor: product.stock === 0 ? "not-allowed" : "pointer",
-          }}
+          disabled={isOutOfStock}
         >
-          {product.stock === 0 ? "Agotado" : "Agregar al carrito"}
+          {isOutOfStock ? (
+            <span>Agotado</span>
+          ) : (
+            <>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
+              <span>Agregar al carrito</span>
+            </>
+          )}
         </button>
       </li>
     );
