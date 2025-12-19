@@ -7,7 +7,7 @@ export const filterInStock = (products) => {
 };
 
 export const filterOnSale = (products) => {
-  return products.filter((product) => product.discount === true);
+  return products.filter((product) => Number(product.discount) > 0);
 };
 
 export const filterByRatingAbove = (products, minRating = 4) => {
