@@ -1,29 +1,3 @@
-/* Grid de productos */
-
-ul.products__list {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
-}
-
-@media (max-width: 1200px) {
-  ul.products__list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 900px) {
-  ul.products__list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  ul.products__list {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* Featured products (4 columnas) */
 .products__list.featured-products {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -410,5 +384,31 @@ ul.products__list {
     margin: 0 16px 16px;
     padding: 12px 20px;
     font-size: 0.9rem;
+  }
+}
+
+/* --- FORZAR GRID EN UL --- */
+ul.products__list {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 1200px) {
+  ul.products__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  ul.products__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  ul.products__list {
+    grid-template-columns: 1fr;
   }
 }
