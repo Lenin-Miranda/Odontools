@@ -1,7 +1,7 @@
 // Utilidades de autenticación con Cookies
 import { getApiUrl } from "../config/api";
 
-const API_URL = "http://localhost:3001/api";
+const API_URL = getApiUrl("/api").replace(/\/api$/, "");
 
 export const handleAuthError = async (response) => {
   if (response.status === 401) {
