@@ -4,6 +4,8 @@
 
 A modern full-stack web application for selling dental products and tools. Complete e-commerce solution with user authentication, shopping cart, admin panel, order management, and automated email notifications.
 
+🔗 **Deploy:** [https://odontools.vercel.app/](https://odontools.vercel.app/)
+
 ![React](https://img.shields.io/badge/React-18+-blue.svg)
 ![Vite](https://img.shields.io/badge/Vite-4+-green.svg)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-green.svg)
@@ -98,16 +100,7 @@ npm install
 ```
 
 3. **Configure environment variables**
-   Create a `.env` file in the backend root:
-
-```env
-PORT=3001
-MONGODB_URI=mongodb://localhost:27017/odontools
-JWT_SECRET=your-secret-key-here
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
-WEBSITE_URL=http://localhost:5173
-```
+   Create a `.env` file in the backend root
 
 4. **Start the backend server**
 
@@ -140,7 +133,7 @@ npm run dev
 4. **Open in browser**
 
 ```
-http://localhost:5173
+http://localhost:3000
 ```
 
 ## 💻 Usage
