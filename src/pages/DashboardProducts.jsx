@@ -1,6 +1,13 @@
 import { FiBox, FiPlus } from "react-icons/fi";
 
 import { useState, useEffect } from "react";
+import {
+  FaSortAlphaDown,
+  FaSortAlphaUp,
+  FaSortAmountDown,
+  FaSortAmountUp,
+  FaRegClock,
+} from "react-icons/fa";
 import ProductModal from "../components/ProductModal/ProductModal";
 import ConfirmModal from "../components/ConfirmModal/ConfirmModal";
 import { useProducts } from "../hooks/useProducts";
@@ -8,6 +15,18 @@ import useConfirm from "../hooks/useConfirm";
 import "./DashboardProducts.css";
 
 export default function DashboardProducts() {
+  // Estado para el ordenamiento
+  const [sortBy, setSortBy] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc"); // "asc" o "desc"
+  // Función para cambiar el ordenamiento
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  };
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -143,7 +162,36 @@ export default function DashboardProducts() {
   };
 
   const filteredProducts = products.filter((product) => {
-    return product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const term = searchTerm.toLowerCase();
+    return (
+      product.name.toLowerCase().includes(term) ||
+      (product.sku && product.sku.toLowerCase().includes(term))
+    );
+  });
+
+  // Ordenar productos filtrados
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    let aValue = a[sortBy];
+    let bValue = b[sortBy];
+    if (sortBy === "name" || sortBy === "category" || sortBy === "sku") {
+      aValue = aValue ? aValue.toLowerCase() : "";
+      bValue = bValue ? bValue.toLowerCase() : "";
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    } else if (sortBy === "createdAt") {
+      // Ordenar por fecha de creación
+      const dateA = new Date(aValue);
+      const dateB = new Date(bValue);
+      if (dateA < dateB) return sortOrder === "asc" ? -1 : 1;
+      if (dateA > dateB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    } else {
+      // numéricos
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    }
   });
 
   return (
@@ -181,6 +229,66 @@ export default function DashboardProducts() {
           >
             <FiPlus />
             Agregar Producto
+          </button>
+        </div>
+        <div className="product__page-sort-container">
+          <button
+            className={`product__page-sort-btn${
+              sortBy === "name" ? " active" : ""
+            }`}
+            onClick={() => handleSort("name")}
+            title="Ordenar por nombre"
+          >
+            Nombre{" "}
+            {sortBy === "name" &&
+              (sortOrder === "asc" ? <FaSortAlphaDown /> : <FaSortAlphaUp />)}
+          </button>
+          <button
+            className={`product__page-sort-btn${
+              sortBy === "price" ? " active" : ""
+            }`}
+            onClick={() => handleSort("price")}
+            title="Ordenar por precio"
+          >
+            Precio{" "}
+            {sortBy === "price" &&
+              (sortOrder === "asc" ? <FaSortAmountDown /> : <FaSortAmountUp />)}
+          </button>
+          <button
+            className={`product__page-sort-btn${
+              sortBy === "stock" ? " active" : ""
+            }`}
+            onClick={() => handleSort("stock")}
+            title="Ordenar por stock"
+          >
+            Stock{" "}
+            {sortBy === "stock" &&
+              (sortOrder === "asc" ? <FaSortAmountDown /> : <FaSortAmountUp />)}
+          </button>
+          <button
+            className={`product__page-sort-btn${
+              sortBy === "createdAt" && sortOrder === "desc" ? " active" : ""
+            }`}
+            onClick={() => {
+              setSortBy("createdAt");
+              setSortOrder("desc");
+            }}
+            title="Más recientes primero"
+          >
+            Más recientes <FaRegClock style={{ marginLeft: 4 }} />
+          </button>
+          <button
+            className={`product__page-sort-btn${
+              sortBy === "createdAt" && sortOrder === "asc" ? " active" : ""
+            }`}
+            onClick={() => {
+              setSortBy("createdAt");
+              setSortOrder("asc");
+            }}
+            title="Más antiguos primero"
+          >
+            Más antiguos{" "}
+            <FaRegClock style={{ marginLeft: 4, transform: "scaleX(-1)" }} />
           </button>
         </div>
 
@@ -232,7 +340,7 @@ export default function DashboardProducts() {
                       </tr>
                     </thead>
                     <tbody>
-                      {products.map((product) => (
+                      {sortedProducts.map((product) => (
                         <tr
                           key={product._id}
                           className="product__page-table-row"
@@ -303,7 +411,7 @@ export default function DashboardProducts() {
 
                 {/* Cards para móvil */}
                 <div className="product__page-cards-container">
-                  {products.map((product) => (
+                  {sortedProducts.map((product) => (
                     <div key={product._id} className="product__page-card">
                       <div className="product__page-card-header">
                         <img
@@ -374,13 +482,14 @@ export default function DashboardProducts() {
                         <th>Imagen</th>
                         <th>Nombre</th>
                         <th>Categoría</th>
+                        <th>SKU</th>
                         <th>Precio</th>
                         <th>Stock</th>
                         <th>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.map((product) => (
+                      {sortedProducts.map((product) => (
                         <tr
                           key={product._id}
                           className="product__page-table-row"
@@ -400,6 +509,11 @@ export default function DashboardProducts() {
                           <td className="product__page-table-cell">
                             <span className="product__page-table-category">
                               {product.category}
+                            </span>
+                          </td>
+                          <td className="product__page-table-cell">
+                            <span className="product__page-table-sku">
+                              {product.sku || "Desconocido"}
                             </span>
                           </td>
                           <td className="product__page-table-cell">
@@ -446,7 +560,7 @@ export default function DashboardProducts() {
 
                 {/* Cards de resultados filtrados para móvil */}
                 <div className="product__page-cards-container">
-                  {filteredProducts.map((product) => (
+                  {sortedProducts.map((product) => (
                     <div key={product._id} className="product__page-card">
                       <div className="product__page-card-header">
                         <img
@@ -460,6 +574,9 @@ export default function DashboardProducts() {
                           </div>
                           <div className="product__page-card-category">
                             {product.category}
+                          </div>
+                          <div className="product__page-card-sku">
+                            <strong>SKU:</strong> {product.sku || "Desconocido"}
                           </div>
                         </div>
                       </div>

@@ -100,10 +100,10 @@ export default function ProductsCard({ products, isFeatured = false }) {
         <button
           className={`products__list-button ${
             isOutOfStock ? "products__list-button--disabled" : ""
-          }`}
+          } ${isInCart(product) ? "products__list-button--added" : ""}`}
           onClick={(e) => {
             e.stopPropagation();
-            if (!isOutOfStock) {
+            if (!isOutOfStock && !isInCart(product)) {
               addToCart(product);
             }
           }}
@@ -111,6 +111,8 @@ export default function ProductsCard({ products, isFeatured = false }) {
         >
           {isOutOfStock ? (
             <span>Agotado</span>
+          ) : isInCart(product) ? (
+            <span>Producto agregado</span>
           ) : (
             <>
               <svg

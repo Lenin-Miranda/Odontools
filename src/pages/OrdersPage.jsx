@@ -500,7 +500,7 @@ export default function OrdersPage() {
                 </p>
                 <p>
                   <strong>Teléfono:</strong>{" "}
-                  {selectedOrder.customerPhone || "No proporcionado"}
+                  {selectedOrder.user?.phone || "No proporcionado"}
                 </p>
                 <p>
                   <strong>Dirección:</strong> {selectedOrder.shippingAddress}
@@ -679,6 +679,7 @@ export default function OrdersPage() {
                     }}
                   >
                     <span>Envío:</span>
+                    <span>{selectedOrder.shippingType}</span>
                     <span>
                       {selectedOrder.shippingCost > 0
                         ? `$${selectedOrder.shippingCost.toFixed(2)}`

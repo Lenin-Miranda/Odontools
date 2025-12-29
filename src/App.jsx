@@ -301,7 +301,16 @@ function App() {
           // Guardar en localStorage (sin token - se maneja con cookies)
           saveUserToStorage(data.user, data.user.isAdmin || false);
         } else {
-          setMessage(data.message || "Error al iniciar sesion.");
+          // Mostrar mensaje específico si la contraseña es incorrecta
+          if (
+            data.message &&
+            (data.error.toLowerCase().includes("contraseña incorrecta") ||
+              data.error.toLowerCase().includes("password incorrect"))
+          ) {
+            setMessage("Contraseña incorrecta");
+          } else {
+            setMessage(data.error || "Error al iniciar sesion.");
+          }
           setMessageType("error");
         }
       } catch (error) {

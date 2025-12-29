@@ -537,6 +537,11 @@ export default function ProductModal({
                 Instrumentos de Cirugía
               </option>
               <option value="Materiales Dentales">Materiales Dentales</option>
+              <option value="Instrumentos para composite">
+                Instrumentos para composite
+              </option>
+              <option value="Grapas">Grapas</option>
+              <option value="Accesorios">Accesorios</option>
             </select>
           </div>
 

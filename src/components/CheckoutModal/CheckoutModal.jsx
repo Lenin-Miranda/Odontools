@@ -16,6 +16,7 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
     phone: userInfo?.phone || "",
     bankAccountName: "",
     bankAccountNumber: "",
+    shippingType: "Cargotrans", // default
   });
 
   const [step, setStep] = useState(1); // 1: Formulario, 2: Confirmación
@@ -34,8 +35,17 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
     }
   }, [isOpen, userInfo]);
 
-  // ✅ Calcular el total correctamente según el paso
-  const shippingCost = cartTotal > 100 ? 0 : 10;
+  // Tipos de envío y costos
+  const SHIPPING_TYPES = [
+    { type: "Cargotrans", label: "Cargotrans 24-48 horas", cost: 0 },
+    { type: "Estandar", label: "Envio Estandar 24 horas", cost: 4 },
+    { type: "Express", label: "Envio Express 1-2 horas", cost: 8 },
+  ];
+
+  const selectedShipping =
+    SHIPPING_TYPES.find((s) => s.type === formData.shippingType) ||
+    SHIPPING_TYPES[0];
+  const shippingCost = selectedShipping.cost;
   const total =
     step === 2 && saleData
       ? saleData.totalPrice // Usar el total guardado en la venta
@@ -97,15 +107,15 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
       }
 
       // Crear la venta
-      const shippingCost = cartTotal > 100 ? 0 : 10;
 
       const salePayload = {
         paymentMethod: formData.paymentMethod,
         shippingAddress: formData.shippingAddress,
         email: formData.email,
         phone: formData.phone,
-        shippingCost: shippingCost, // ✅ Agregar el costo de envío
+        shippingType: formData.shippingType,
       };
+      console.log(salePayload);
 
       // Agregar datos bancarios si es transferencia
       if (formData.paymentMethod === "transfer") {
@@ -138,6 +148,7 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
       phone: "",
       bankAccountName: "",
       bankAccountNumber: "",
+      shippingType: "Cargotrans",
     });
     setStep(1);
     setSaleData(null);
@@ -176,10 +187,46 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
                 <div className="checkout-summary-row">
                   <span>Envío:</span>
                   <span className={shippingCost === 0 ? "free-shipping" : ""}>
-                    {shippingCost === 0
-                      ? "GRATIS 🎉"
-                      : `$${shippingCost.toFixed(2)}`}
+                    {selectedShipping.label}{" "}
+                    {shippingCost === 0 ? "GRATIS 🎉" : `$${shippingCost}`}
                   </span>
+                </div>
+                {/* Tipo de envío */}
+                <div className="checkout-section">
+                  <h3 className="checkout-section-title">🚚 Tipo de Envío</h3>
+                  <div className="checkout-shipping-types">
+                    {SHIPPING_TYPES.map((option) => {
+                      let icon = null;
+                      if (option.type === "Cargotrans")
+                        icon = <span className="shipping-icon">🚚</span>;
+                      if (option.type === "Estandar")
+                        icon = <span className="shipping-icon">📦</span>;
+                      if (option.type === "Express")
+                        icon = <span className="shipping-icon">⚡</span>;
+                      return (
+                        <label
+                          key={option.type}
+                          className="shipping-type-option"
+                        >
+                          <input
+                            type="radio"
+                            name="shippingType"
+                            value={option.type}
+                            checked={formData.shippingType === option.type}
+                            onChange={handleChange}
+                            disabled={loading}
+                          />
+                          <span>
+                            {icon}
+                            {option.label}{" "}
+                            {option.cost === 0
+                              ? "(GRATIS)"
+                              : `($${option.cost})`}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="checkout-summary-row total">
                   <span>Total:</span>
@@ -357,8 +404,11 @@ export default function CheckoutModal({ isOpen, onClose, userInfo }) {
                 </>
               )}
               <div className="success-row">
-                <span>Tiempo de entrega:</span>
-                <span>2-3 días hábiles</span>
+                <span>Tipo de envío:</span>
+                <span>
+                  {selectedShipping.label}{" "}
+                  {shippingCost === 0 ? "(GRATIS)" : `(C$${shippingCost})`}
+                </span>
               </div>
             </div>
 

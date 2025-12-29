@@ -154,8 +154,8 @@ export default function Contact() {
               rel="noopener noreferrer"
               className="contact__whatsapp-button"
             >
-              <FaWhatsapp />
-              <span>Abrir WhatsApp</span>
+              <FaWhatsapp style={{ color: "#000" }} />
+              <span style={{ color: "#000" }}>Abrir WhatsApp</span>
             </a>
           </div>
 

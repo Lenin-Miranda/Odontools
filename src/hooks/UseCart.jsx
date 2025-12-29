@@ -196,7 +196,20 @@ export function CartProvider({ children }) {
     }
   };
 
-  const isInCart = (id) => cart.some((item) => item.product?._id === id);
+  // Permite pasar el producto o el id directamente
+  const isInCart = (productOrId) => {
+    const id =
+      typeof productOrId === "object"
+        ? productOrId._id || productOrId.id
+        : productOrId;
+    return cart.some((item) => {
+      // El backend puede devolver el producto como 'product' o como el objeto directo
+      if (item.product) {
+        return item.product._id === id || item.product.id === id;
+      }
+      return item._id === id || item.id === id;
+    });
+  };
 
   const deleteItem = async (id) => {
     try {

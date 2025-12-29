@@ -1,4 +1,4 @@
-import prueba from "../../assets/tools/3exploradorEXD56.jpg";
+import prueba from "../../assets/hero-image.png";
 import "./Header.css";
 import { NavLink } from "react-router-dom";
 import { Link } from "react-scroll";

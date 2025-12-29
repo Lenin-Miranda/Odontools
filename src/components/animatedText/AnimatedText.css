@@ -1,0 +1,14 @@
+.jump {
+  display: inline-block;
+  animation: jump 10s ease-in-out infinite;
+}
+
+@keyframes jump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}

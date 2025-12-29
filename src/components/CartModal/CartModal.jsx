@@ -18,8 +18,18 @@ export default function CartModal({
 }) {
   const { addToCart, removeFromCart, deleteItem, cartTotal, totalQuantity } =
     useCart();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
+  // Calcular subtotal y total con descuentos aplicados
+  const subtotalWithDiscount = cartItems.reduce((acc, item) => {
+    const product = item.product || item;
+    const price = product.price || 0;
+    const discount = product.discount || 0;
+    const quantity = item.quantity || 1;
+    const discountedPrice =
+      discount > 0 ? price - (price * discount) / 100 : price;
+    return acc + discountedPrice * quantity;
+  }, 0);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   // ✅ useEffect para cerrar con Escape
   useEffect(() => {
@@ -59,7 +69,9 @@ export default function CartModal({
         }}
       >
         <div className="cart__modal-container">
-          <h1 className="cart__modal-container-title">Carrito de compras</h1>
+          <h1 className="cart__modal-container-title">
+            Carrito De <span className="cart__title-highlight">Compras</span>
+          </h1>
           <p
             className="cart__modal-container-subtitle"
             style={{ fontWeight: "600", opacity: ".5" }}
@@ -97,7 +109,12 @@ export default function CartModal({
                 // ✅ Ahora item tiene estructura: { _id: cartItemId, product: {...}, quantity: 1 }
                 const product = item.product || item; // Compatibilidad con ambas estructuras
                 const productId = product._id || product.id;
-                const subtotal = (product.price || 0) * (item.quantity || 1);
+                const price = product.price || 0;
+                const discount = product.discount || 0;
+                const quantity = item.quantity || 1;
+                const discountedPrice =
+                  discount > 0 ? price - (price * discount) / 100 : price;
+                const subtotal = discountedPrice * quantity;
 
                 return (
                   <li
@@ -126,13 +143,7 @@ export default function CartModal({
                       {/* Precio y eliminar */}
                       <div className="cart__modal-container-list-item-r-container">
                         <p className="cart__modal-container-list-item-r-container-price">
-                          $
-                          {product.discount > 0
-                            ? (
-                                product.price -
-                                (product.price * product.discount) / 100
-                              ).toFixed(2)
-                            : product.price}
+                          ${discountedPrice.toFixed(2)}
                         </p>
 
                         <button
@@ -201,32 +212,21 @@ export default function CartModal({
             <div className="cart__modal-container-total-products">
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p className="cart__modal-container-total-products-total">
-                  Subtotal{" "}
+                  Subtotal
                   <span style={{ fontWeight: "700", marginLeft: "2px" }}>
                     ({totalQuantity} Productos)
                   </span>
                 </p>
-                <p style={{ fontWeight: "600" }}>{cartTotal.toFixed(2)}</p>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <p className="cart__modal-container-total-products-total">
-                  Envio
-                </p>
-                <p
-                  style={
-                    cartTotal > 100
-                      ? { color: "#00c100", fontWeight: "700" }
-                      : { color: "red", fontWeight: "700" }
-                  }
-                >
-                  {cartTotal > 100 ? "Gratis" : "$10"}
+                <p style={{ fontWeight: "600" }}>
+                  ${subtotalWithDiscount.toFixed(2)}
                 </p>
               </div>
             </div>
             <div className="cart__modal-container-payment">
               <div className="cart__modal-container-payment-total">
-                {" "}
-                <span style={{ fontWeight: "700", fontSize: "16" }}>Total</span>
+                <span style={{ fontWeight: "700", fontSize: "16px" }}>
+                  Total
+                </span>
                 <span
                   style={{
                     fontWeight: "600",
@@ -235,7 +235,7 @@ export default function CartModal({
                     letterSpacing: "0",
                   }}
                 >
-                  ${cartTotal > 100 ? cartTotal.toFixed(2) : cartTotal + 10}
+                  ${subtotalWithDiscount.toFixed(2)}
                 </span>
               </div>
               <div className="cart__modal-container-payment-buttons">

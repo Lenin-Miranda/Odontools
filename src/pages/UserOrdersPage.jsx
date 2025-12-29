@@ -146,6 +146,8 @@ const UserOrdersPage = () => {
     }
   };
 
+  console.log(filteredOrders);
+
   const calculateOrderStats = () => {
     const totalOrders = orders.length;
     const totalSpent = orders.reduce((sum, order) => sum + order.totalPrice, 0);
@@ -433,7 +435,7 @@ const UserOrdersPage = () => {
                     </div>
                     <div>
                       <strong>Teléfono:</strong>{" "}
-                      {selectedOrder.customerPhone || "No proporcionado"}
+                      {selectedOrder.user.phone || "No proporcionado"}
                     </div>
                   </div>
                 </div>
@@ -485,17 +487,18 @@ const UserOrdersPage = () => {
                         marginBottom: "0.5rem",
                         fontSize: "0.95rem",
                         color:
-                          selectedOrder.shippingCost > 0
+                          selectedOrder.shippingCost < 0
                             ? "#ef4444"
-                            : "#10b981",
+                            : "#000000ff",
                       }}
                     >
                       <span>Envío:</span>
                       <span>
-                        {selectedOrder.shippingCost > 0
-                          ? `$${selectedOrder.shippingCost.toFixed(2)}`
-                          : "Gratis 🎉"}
+                        {selectedOrder.shippingType
+                          ? `${selectedOrder.shippingType} `
+                          : "Cargotrans"}
                       </span>
+                      <span>${selectedOrder.shippingCost}</span>
                     </div>
                     <div
                       style={{
